@@ -37,11 +37,37 @@ jobs:
         working-directory: ./control-room
         run: pnpm install --frozen-lockfile
 
+      - name: Detect deployment mode
+        id: detect-mode
+        run: |
+          if [ -f "CNAME" ]; then
+            echo "mode=custom_domain" >> $GITHUB_OUTPUT
+            echo "base_path=" >> $GITHUB_OUTPUT
+            echo "Custom domain detected - using empty base path"
+          else
+            echo "mode=repo_path" >> $GITHUB_OUTPUT
+            echo "base_path=/PulZ" >> $GITHUB_OUTPUT
+            echo "Repository path mode - using /PulZ base path"
+          fi
+
       - name: Build site
         working-directory: ./control-room
         env:
-          NEXT_PUBLIC_BASE_PATH: /PulZ
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.detect-mode.outputs.base_path }}
         run: pnpm build
+
+      - name: Verify build artifacts
+        working-directory: ./control-room
+        run: |
+          if [ ! -f "out/index.html" ]; then
+            echo "::error::index.html not found in build output"
+            exit 1
+          fi
+          if [ ! -f "out/404.html" ]; then
+            echo "::error::404.html not found in build output"
+            exit 1
+          fi
+          echo "Build artifacts verified: index.html and 404.html present"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

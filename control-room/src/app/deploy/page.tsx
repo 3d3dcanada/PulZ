@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import SystemMap from '@/components/SystemMap'
 
 const deploymentPaths = [
   {
@@ -58,8 +57,6 @@ export default function DeployPage() {
   return (
     <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <SystemMap />
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

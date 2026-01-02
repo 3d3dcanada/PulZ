@@ -6,15 +6,16 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navItems = [
-  { href: '/', label: 'Control Room' },
+  { href: '/entry', label: 'Entry' },
+  { href: '/governance', label: 'Governance' },
   { href: '/philosophy', label: 'Philosophy' },
   { href: '/architecture', label: 'Architecture' },
   { href: '/safety', label: 'Safety' },
   { href: '/confidence', label: 'Confidence' },
   { href: '/consensus', label: 'Consensus' },
-  { href: '/governance', label: 'Governance' },
   { href: '/lanes', label: 'Lanes' },
-  { href: '/deploy', label: 'Deploy' },
+  { href: '/learning', label: 'Learning' },
+  { href: '/settings', label: 'Settings' },
 ]
 
 export default function Navigation() {
