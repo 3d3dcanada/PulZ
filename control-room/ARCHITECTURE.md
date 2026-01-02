@@ -23,6 +23,34 @@ Beyond AI logic, the system enforces deterministic boundaries:
 - **Loop Detection**: Stops recursive AI logic patterns.
 - **Trace Auditability**: Every decision is stored with its full validation trace (all 4 gates).
 
+## Build Safety & Invariants
+
+The build system enforces explicit dependencies to prevent silent failures. This is not a tool limitation—it is a deliberate architectural invariant.
+
+### Root Cause Pattern
+Build failures can occur when components implicitly use dependencies without explicit imports. This happens because:
+- A component references a JSX element (e.g., `<AnimatePresence>`)
+- The dependency exists in the installed packages (e.g., framer-motion exports it)
+- The import statement is missing from the file
+- TypeScript allows usage before the build gate
+
+### Dependency Invariant
+**All animation primitives and React components must be explicitly imported at the component level.**
+
+This means:
+- `motion` must be imported: `import { motion } from 'framer-motion'`
+- `AnimatePresence` must be imported: `import { AnimatePresence } from 'framer-motion'`
+- Any JSX identifier must have a corresponding import
+- No reliance on global or implicit imports
+
+### Hardening Mechanism
+ESLint rule `react/jsx-no-undef` is enabled and enforced at build time. This rule:
+- Fails the build when JSX identifiers are used without import
+- Catches missing dependencies before deployment
+- Prevents silent runtime errors
+
+The build gate correctly stopped deployment when AnimatePresence was used without import in Step 2. This is the system working as designed.
+
 ## Technology Stack
 
 ### Core Framework
