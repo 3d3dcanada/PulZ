@@ -41,19 +41,30 @@ If you have one minute, follow this path to understand the PulZ trust model:
 
 ## 🛡️ Governance Guarantees
 
-PulZ is engineered with hard boundaries to ensure trust and durability.
+PulZ is engineered with hard boundaries to ensure trust and durability. Governance is enforced by the **kernel layer**, not by UI language.
+
+### Kernel-Enforced Invariants
+
+The kernel layer makes it structurally impossible to:
+
+1. **Execute without approval**: Every `DecisionFrame` has `approval_required: true` hardcoded. No code path allows silent execution.
+2. **Recommend without evidence**: All decisions must reference an `EvidenceReport`. Validation fails if missing.
+3. **Bypass confidence thresholds**: Scores below 50 produce empty `allowed_actions` arrays. The UI cannot override this.
+4. **Rewrite decision history**: The `AppendOnlyLog` only appends. Revocation is a new event, not a deletion.
 
 ### What PulZ Will Never Do
 - **Never act on unverified claims**: If a claim has no evidence or citation, it is blocked or escalated.
 - **Never hide disagreement**: If model consensus is below 70%, the conflict is surfaced to the human.
 - **Never exceed budgets**: Hard circuit breakers on cost, tokens, and time are enforced at the kernel level.
 - **Never hallucinate silently**: The 4-gate system rejects any output that fails schema or consistency checks.
+- **Never allow invalid transitions**: Status transitions are validated. You cannot go from rejected → approved.
 
 ### What Always Requires Human Approval
+- **All decisions**: `approval_required` is hardcoded to `true` in the kernel. No exceptions.
 - **Material financial decisions**: Any action involving money above a configurable threshold.
 - **Irreversible state changes**: Deleting data, sending major communications, or changing core business rules.
-- **Low-confidence outcomes**: Any output where the integrated confidence score is below 70%.
-- **Novel scenarios**: Tasks that don't match historical patterns or explicit instructions.
+- **Low-confidence outcomes**: Any output where the integrated confidence score is below 50 is blocked entirely.
+- **Novel scenarios**: Tasks that don&apos;t match historical patterns or explicit instructions.
 
 ## 🏗️ Built With
 
@@ -90,6 +101,17 @@ pnpm build
 
 # Output in ./out/ directory
 ```
+
+### Kernel Overview
+
+The **kernel layer** enforces governance through code:
+
+- **Primitives**: `EvidenceItem`, `EvidenceReport`, `DecisionFrame`, `AuditEvent`
+- **Policies**: `confidencePolicy`, `governancePolicy`
+- **Validators**: `evidenceValidator`, `decisionValidator`
+- **Audit**: `AppendOnlyLog` with cryptographic hash chaining
+
+See `/governance` page for interactive demonstration. See `ARCHITECTURE.md` for detailed specifications.
 
 ### Local Static Preview
 
@@ -144,6 +166,7 @@ control-room/
 │   │   ├── safety/       # Four validation gates
 │   │   ├── confidence/   # Interactive confidence scoring
 │   │   ├── consensus/    # Multi-model agreement/conflict
+│   │   ├── governance/   # Kernel-enforced governance demo
 │   │   ├── lanes/        # Business operation flows
 │   │   └── deploy/       # Deployment paths, checklist
 │   ├── components/       # Interactive components
@@ -152,11 +175,20 @@ control-room/
 │   │   ├── GateValidator.tsx
 │   │   ├── ConfidenceSlider.tsx
 │   │   ├── ConsensusVisualizer.tsx
+│   │   ├── DecisionFrameDemo.tsx
+│   │   ├── AuditViewer.tsx
 │   │   └── LaneFlow.tsx
 │   └── lib/              # Utilities (if needed)
+├── kernel/               # Governance kernel (TypeScript)
+│   ├── primitives/       # Core data structures
+│   ├── policies/         # Confidence and governance policies
+│   ├── validators/       # Evidence and decision validators
+│   ├── audit/            # Append-only log with hash chaining
+│   └── index.ts          # Public kernel API
 ├── public/               # Static assets
 ├── LICENSE               # Apache 2.0
 ├── README.md             # This file
+├── ARCHITECTURE.md       # Technical architecture + kernel specs
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.ts

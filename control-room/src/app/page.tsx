@@ -12,6 +12,13 @@ const features = [
     color: 'gate-structural',
   },
   {
+    title: 'Kernel-Enforced Governance',
+    description: 'Structural invariants make silent execution impossible. Code-level enforcement, not UI language.',
+    href: '/governance',
+    icon: '⚖️',
+    color: 'gate-evidence',
+  },
+  {
     title: 'Confidence Scoring',
     description: 'Transparent confidence levels determine what requires approval and what can proceed.',
     href: '/confidence',

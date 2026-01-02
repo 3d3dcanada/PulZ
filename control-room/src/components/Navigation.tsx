@@ -12,6 +12,7 @@ const navItems = [
   { href: '/safety', label: 'Safety' },
   { href: '/confidence', label: 'Confidence' },
   { href: '/consensus', label: 'Consensus' },
+  { href: '/governance', label: 'Governance' },
   { href: '/lanes', label: 'Lanes' },
   { href: '/deploy', label: 'Deploy' },
 ]
