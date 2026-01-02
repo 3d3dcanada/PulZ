@@ -1,0 +1,779 @@
+Below is the **one-shot, copy/paste “PulZ Bible” master report** (investor + engineering handoff) compiled from what you’ve said in this chat and the documents you uploaded. It includes: **scope, story, architecture, anti-hallucination protocol, multi-AI consensus rules, tool/peripheral contracts for Claude, model roster (including NVIDIA Nemotron), decision framework, risks, and “what to do next.”**
+
+Where I cite sources, I’m citing **your uploaded docs** and **current public docs** (Lovable + NVIDIA) you explicitly asked me to research.
+
+---
+
+# PulZ — Full System Manuscript (Investor + Build Handoff)
+
+**Version:** v1.1 (January 2026 draft)
+**Codename / Product Name:** **PulZ**
+**Owner / Vision:** 3D3D.ca (Randall)
+**Primary outcomes:**
+
+1. A **non-hallucinating**, auditable, multi-model AI operating system that can run a business via *one daily conversation*, not spammy “interruptions.”
+2. A **quote + tender + email intake → structured actions** engine (the “real business work”).
+3. A **consistent memory bank** + **cross-model consensus** that forces “prove it” behavior.
+
+---
+
+## 0) Executive Summary (What PulZ is, in one page)
+
+**PulZ** is an **AI Orchestration Operating System** designed to help non-technical founders run real operations without getting dragged into tool complexity, hallucinations, or AI “looping.” PulZ is built around the core insight you repeated in voice:
+
+> “The entire thing is designed just to be able to hold a conversation… one time a day… no hallucinations… no stupid questions… maximum time back.”
+
+PulZ does **not** try to be “another chatbot.” It is a **structured orchestration layer** that:
+
+* Converts messy human intent into **structured tasks** with success criteria and hard limits (tokens, steps, dollars, time). 
+* Uses **multiple AIs** (Claude / GPT / Gemini / local models / Groq / NVIDIA models) as *specialists*, then forces a **consensus + citation** gate before anything becomes “truth.”
+* Treats hallucination prevention as a **first-class system requirement**, with **audit trails**, **circuit breakers**, and **validation layers** (schema checks, cross-checking, plausibility checks, and “human approval required” escalation).  
+* Ultimately integrates into the practical execution layer you care about:
+
+  * **Email intake**
+  * **Quote intake**
+  * **Tender discovery**
+  * **Decision-ready morning brief**
+  * **Website iteration workflow (Lovable + Claude Code)**
+
+**Positioning:** PulZ is the “business brain + safety rails” layer that wraps powerful models and tools in a workflow that matches how real founders operate—especially founders with ADHD who need **clarity, pacing, and zero fluff**.
+
+---
+
+## 1) The Problem PulZ Solves (The real pain, not “AI hype”)
+
+### 1.1 Reality of founders using AI today
+
+Most founders hit the same wall:
+
+* Models hallucinate confidently.
+* Tools require “automation literacy” (n8n etc.) that many users don’t have.
+* AI assistants waste time with unnecessary questions.
+* Systems drift: today’s decision contradicts last week’s plan.
+* “Agentic” tools can be dangerous without guardrails (security, cost runaway, tool abuse).
+
+### 1.2 Your specific pain points (from this chat, stated explicitly)
+
+* **No hallucinations. Period.**
+* **No stupid questions.**
+* **No interrupting you all day.**
+* **One daily conversation** that outputs **decision-ready actions**.
+* The system must help you run:
+
+  * **Quotes**
+  * **Email parsing**
+  * **Tenders**
+  * **Website iteration**
+  * **Operations & maker network** (3D3D model)
+
+---
+
+## 2) PulZ Core Principles (Non-negotiables)
+
+These are “constitution-level” rules.
+
+### 2.1 Truth Model (How PulZ defines truth)
+
+PulZ only treats something as “true” if it is one of:
+
+1. **Direct system observation** (tool output, logs, database value, API response).
+2. **User-provided fact** confirmed by you (explicit).
+3. **Cited external source** (and PulZ stores the citation).
+4. **Consensus-backed inference** clearly labeled as inference.
+
+Anything else is **UNVERIFIED** and must be labeled.
+
+### 2.2 The “No Hallucination Contract”
+
+PulZ must:
+
+* Extract claims
+* Validate claims
+* Assign confidence
+* Refuse / escalate if below threshold
+
+This is aligned with the “multi-layer validation system” and “confidence score + regenerate + human escalation” described in your research/patent doc. 
+
+### 2.3 Operational cadence
+
+* Default: **1 daily session** (morning brief + decision + actions queued).
+* Optional: extra sessions only when *you* initiate.
+* No “AI pinging you throughout the day,” unless explicitly configured for true emergencies (fraud, massive unexpected cost, etc.)—and even that requires pattern detection.
+
+---
+
+## 3) System Scope (What PulZ must do)
+
+PulZ has two overlapping product tracks:
+
+### Track A — 3D3D Business OS (real operations)
+
+PulZ supports 3D3D’s model:
+
+* Customer requests quotes, uploads files, chooses materials
+* Maker network fulfills prints
+* Credits / tokens system
+* Admin oversight
+* Quality standards and routing logic
+
+Your 3D3D planning doc includes:
+
+* customer front-end, maker portal, admin portal, credits/payment flow, routing, QC standards, order flow, failure protocol, marketing + content strategy.  
+
+### Track B — PulZ Platform (a sellable system)
+
+PulZ becomes the underlying agent OS others can use:
+
+* “Self-orchestrating agent system”
+* tool discovery
+* circuit breakers
+* cross-session learning
+* human-in-loop approvals
+  This aligns with the claims in your patent/research doc. 
+
+---
+
+## 4) The PulZ Architecture (How it actually works)
+
+### 4.1 The pipeline (high-level)
+
+**Input → Normalize → Plan → Execute → Validate → Store → Brief**
+
+1. **Input ingestion**
+
+   * Email
+   * Form submissions (quote)
+   * Tender feeds
+   * Website tasks (Lovable/Git)
+   * Your manual “morning conversation”
+
+2. **Normalization**
+
+   * Convert each input into a standard internal object:
+
+     * `QuoteRequest`
+     * `TenderOpportunity`
+     * `WebsiteTask`
+     * `VendorEmail`
+     * `DecisionRequest`
+
+3. **Planning**
+
+   * Generate 2–4 strategies (not 25)
+   * Assign predicted cost/time/risk
+   * Choose best plan under constraints
+
+4. **Execution**
+
+   * Run steps with **hard limits**
+   * Tool calls / model calls are budgeted
+
+5. **Validation**
+
+   * Schema validation
+   * Claim extraction + verification
+   * Cross-model critique (consensus)
+   * Plausibility checks
+
+6. **Memory + Audit**
+
+   * Store what worked, what failed, cost, time 
+   * Store citations and tool outputs
+   * Store “learned patterns” (“Gemini Flash works well for X”) 
+
+7. **Morning Brief Output**
+
+   * “What changed”
+   * “What matters today”
+   * “Decisions needed”
+   * “Queued actions pending approval”
+   * “Risks / anomalies”
+   * “Revenue opportunities”
+
+---
+
+## 5) The Anti-Hallucination Protocol (Full, explicit, buildable)
+
+This is the part you demanded: **the protocol**.
+
+### 5.1 Hard limits (circuit breaker)
+
+PulZ must stop runaway behavior using limits like these (already present in your scope doc):
+
+* max AI calls per task
+* max tokens per task
+* max cost per task
+* timeout
+* loop detection 
+
+**Rule:** When a circuit breaker trips, PulZ must output:
+
+* what it was trying to do
+* what limit tripped
+* what evidence it had
+* what it recommends next
+* what it needs from you (only if truly required)
+
+### 5.2 Multi-layer validation (truth gates)
+
+From your research/patent doc:
+
+* schema validation
+* fact verification against trusted sources
+* internal consistency checking
+* plausibility assessment
+* composite confidence score
+* regenerate if below threshold
+* escalate to human if below critical threshold 
+
+PulZ implements this as **four gates**:
+
+#### Gate 1 — Structural Gate (Schema)
+
+* Output must conform to schema.
+* If schema fails: regenerate once; if fail twice: stop and ask for correction.
+
+#### Gate 2 — Evidence Gate (Citations / tool outputs)
+
+* Any claim that affects money, safety, compliance, or external communication must include either:
+
+  * tool output evidence, or
+  * external citation, or
+  * “USER_CONFIRMED” marker.
+
+#### Gate 3 — Consistency Gate (No contradictions)
+
+* Compare to:
+
+  * today’s task context
+  * stored memory
+  * business rules
+    If contradictions appear: PulZ must surface them as a “conflict list,” not choose silently.
+
+#### Gate 4 — Consensus Gate (multi-model critique)
+
+* A second model critiques:
+
+  * missing assumptions
+  * suspicious certainty
+  * logic holes
+  * security risks
+    Then PulZ outputs:
+* “Primary answer”
+* “Critique summary”
+* “Remaining uncertainties”
+* “Decision required from user” (only if necessary)
+
+### 5.3 Confidence scoring (explicit)
+
+PulZ uses a 0–100 confidence score:
+
+* 90–100: safe to act automatically (low risk)
+* 70–89: act only on reversible actions (drafts, proposals, staging changes)
+* 50–69: requires explicit user approval
+* <50: refuse / request clarification / gather evidence
+
+### 5.4 The “Stupid Question Filter”
+
+PulZ must not ask you things already answered by:
+
+* the docs
+* current task context
+* memory
+  Instead, it must propose defaults and proceed, **unless** the missing detail would cause irreversible harm.
+
+**Rule:** A question is only allowed if it changes the plan materially.
+
+---
+
+## 6) Multi-AI Orchestration (How PulZ uses different models)
+
+You were explicit: you want **multiple AIs** and a **human tiebreaker** when they disagree.
+
+### 6.1 Roles (recommended)
+
+PulZ assigns roles, not “one model does all.”
+
+* **Orchestrator (You want me here):**
+  Produces structure, constraints, audit logic, final brief.
+
+* **Execution Engineer (Claude Code / Opus):**
+  Writes/edits code, refactors, polishes UI, runs repo operations.
+
+* **Research & Citations (Perplexity-like behavior):**
+  Collects sources, extracts facts, attaches citations.
+
+* **Long-context bulk processor (NVIDIA Nemotron 3 Nano):**
+  Overnight ingestion / summarization / large context stitching.
+
+* **Fast local utilities (Groq / local Llama):**
+  cheap classification, tagging, routing, quick drafts.
+
+### 6.2 NVIDIA Nemotron-3 Nano 30B A3B — where it fits
+
+NVIDIA describes **Nemotron-3 Nano 30B A3B** as an **open, efficient MoE model with up to 1M context**, strong at coding/reasoning/tool calling. ([NVIDIA NIM APIs][1])
+
+**PulZ role for Nemotron:**
+
+* “Overnight lane” for:
+
+  * ingesting long docs
+  * stitching context
+  * generating “candidate briefs”
+  * producing initial strategy trees
+    Then **Claude/GPT** do final polish + safety gates.
+
+**Important reality check:**
+Even if the model supports **1M context**, default configs may be smaller (Hugging Face notes default config may be 256k due to VRAM). ([Hugging Face][2])
+So PulZ should treat “1M context” as **capability** but adapt to actual deployment constraints.
+
+### 6.3 NVIDIA NIM (hosting path)
+
+NVIDIA’s developer ecosystem offers NIM access and distinguishes:
+
+* **Developer Program access** for prototyping/testing ([NVIDIA Developer][3])
+* A **90-day NVIDIA AI Enterprise trial** for production-grade licensing/support ([NVIDIA API Documentation][4])
+  There’s also discussion of **trial credits** in NVIDIA’s forum posts. ([NVIDIA Developer Forums][5])
+
+**PulZ recommendation:**
+Use NIM for:
+
+* fast deployment experiments
+* standard inference endpoints
+  But for “investor-grade” reliability, PulZ must be cloud-agnostic:
+* local inference option
+* containerized inference option
+* multiple providers
+
+### 6.4 Lovable + Claude working together (your stated workflow)
+
+You want:
+
+* Claude does heavy lifting on codebase styling, structure, refactors.
+* Lovable uses daily credits for small targeted iterations and UI tweaks.
+
+This is consistent with Lovable’s plan mechanics:
+
+* Pro includes **100 monthly credits** + **5 daily credits up to 150/month** ([Lovable][6])
+
+---
+
+## 7) Claude Code + Repo Control (what “full control” really means)
+
+### 7.1 What you want in practice
+
+“Give Claude full control of my repo” means:
+
+* Claude can read the repo
+* propose changes
+* run tests/build
+* open PRs
+* iterate safely with guardrails
+
+Anthropic’s own “Claude Code best practices” explicitly references Claude Code handling GitHub interactions. ([Anthropic][7])
+
+**PulZ build standard:**
+Claude never pushes directly to main. It:
+
+* works in branches
+* opens PRs
+* PR must pass:
+
+  * lint/build/test
+  * PulZ validation gates
+  * (optional) human approval
+
+### 7.2 Security warning (non-negotiable)
+
+Any system that can run tools / write code can be abused if misconfigured. Recent reporting around tool/plugin abuse risks reinforces why PulZ must enforce tool trust and approvals. ([Axios][8])
+
+**PulZ rule:**
+
+* No “wild” tool execution.
+* Tool allowlist only.
+* Secrets management locked down.
+* All destructive actions require explicit approval.
+
+---
+
+## 8) The “Bible” Implementation: PulZ Modules (build list)
+
+### Module 1 — **PulZ Kernel**
+
+* Task schema + state machine
+* Budgets (tokens/cost/time/steps)
+* Circuit breaker + loop detector 
+* Audit log writer (append-only)
+
+### Module 2 — **Memory System**
+
+* “Facts” store (validated only)
+* “Notes” store (unvalidated)
+* “Learned patterns” store (“X model works for Y”) 
+* “Contradictions” store (flagged conflicts)
+
+### Module 3 — **Validation Engine**
+
+Implements the patent-style method:
+
+* claim extraction
+* verification
+* consistency
+* plausibility
+* confidence scoring
+* regenerate/escalate 
+
+### Module 4 — **Consensus Engine**
+
+* Runs 2nd/3rd model critique
+* Produces “agreement map”:
+
+  * what all models agree on
+  * what conflicts
+  * what needs user tiebreak
+
+### Module 5 — **Ingestion Connectors**
+
+* Email connector (IMAP/Gmail or provider)
+* Form connector (Formspree or your site)
+* Tender connector (feeds/scrapers)
+* Repo connector (GitHub / GitLab / etc.)
+
+### Module 6 — **Morning Brief Generator**
+
+Outputs:
+
+* Today priorities
+* New quotes
+* New tenders
+* Pending approvals
+* Risk flags
+* Suggested actions
+
+### Module 7 — **3D3D Business Layer**
+
+* Quotes → maker routing → credits flow
+  (Your 3D3D doc already outlines customer/maker/admin features, routing, QC, failure protocol.)  
+
+---
+
+## 9) 3D3D Website + App Requirements (from your docs)
+
+You already have an explicit website structure guide:
+
+* dark cyberpunk aesthetic
+* clean professional UI
+* page list and SEO metadata
+* quote form fields and success message
+* performance + accessibility targets  
+
+You also have the 3D3D roadmap and features:
+
+* customer accounts
+* credits
+* repository browsing
+* uploads
+* tracking
+* maker job board
+* admin dashboards
+* later: auto matching, messaging, royalties, mobile 
+
+PulZ should treat these as:
+
+* **requirements backlog**
+* not “random wishes”
+* prioritized by “revenue impact + operational readiness”
+
+---
+
+## 10) “What other AIs said” (and conflicts)
+
+### Important limitation (honest)
+
+Some of the “AI input” PDFs you uploaded (Grok/Mitral) are **image-only** in this environment and **text couldn’t be parsed** by my document reader.  
+So I cannot truthfully quote or attribute their exact bullet points yet.
+
+### What I *can* attribute from your parsed PulZ scope doc
+
+Your scope doc already encodes “model specialization” patterns like:
+
+* “CRM research → Gemini Flash works well”
+* “Pricing extraction → DeepSeek R1 is accurate + cheap” 
+
+**PulZ interpretation:**
+This is exactly what the “learned patterns” store should formalize: a continuously improving routing table of **task type → best model/tool**.
+
+### Known conflict zones (based on your stated constraints)
+
+These are the areas that always cause disagreement among models, and PulZ must force resolution:
+
+1. **Autonomy vs safety**
+
+   * Some AIs push “full agent autonomy.”
+   * You demand: guardrails, no hallucinations, human authority.
+
+2. **Interrupt-driven assistants vs your cadence**
+
+   * Many assistants propose constant pings.
+   * You demand: one daily conversation, no interruptions.
+
+3. **Tool complexity vs “for dummies” operation**
+
+   * Some will push n8n-style complexity.
+   * You demand: simple conversational control, minimal moving parts.
+
+PulZ resolves these conflicts by **constitution rules** (Sections 2–5).
+
+---
+
+## 11) Stats + Graphs (current, January 2026 relevant)
+
+### 11.1 Lovable credits (verified, current)
+
+Lovable Pro: **100 monthly credits + 5 daily credits (up to 150/month)** ([Lovable][6])
+
+**Graph: monthly usable credits (approx.)**
+
+```
+Lovable Pro credits/month
+Base monthly:   ██████████████████████ 100
+Daily bonus:    ██████████████████████████████ 150 (cap)
+Typical total:  █████████████████████████████████████████ 250*
+```
+
+*Note: “total” depends on whether monthly + daily stack the way you actually consume; Lovable describes 5 daily up to 150/mo and also 100 monthly credits on Pro. ([Lovable][6])
+
+### 11.2 Nemotron context (verified)
+
+* NVIDIA Build page: Nemotron-3 Nano 30B A3B is positioned as **MoE**, long-context, “run anywhere.” ([NVIDIA NIM APIs][1])
+* Hugging Face warns practical config defaults may be lower than max due to VRAM. ([Hugging Face][2])
+
+**Graph: context “capability vs practical default”**
+
+```
+Nemotron 3 Nano context window
+Max capability: ██████████████████████████████████████████████████ 1,000,000
+Common default: ████████████████ 256,000
+```
+
+(Exact operational context depends on deployment and memory.)
+
+### 11.3 NIM access posture (verified)
+
+* NVIDIA positions Developer Program NIM access as **prototyping/testing**, with production licensing via AI Enterprise trial. ([NVIDIA API Documentation][4])
+
+---
+
+## 12) Investor Narrative (what makes PulZ defensible)
+
+Your patent/research doc explicitly names business risks and mitigations:
+
+* incumbents copy features → build moats (data, learning, community), move fast, patent novel parts 
+* regulatory concerns → transparency, audit trails, compliance posture 
+
+### PulZ defensibility pillars
+
+1. **Auditability moat**
+
+   * Most agents cannot show “why they believed something.”
+   * PulZ stores evidence + confidence + tool outputs.
+
+2. **Learning moat**
+
+   * “learned patterns” continuously improve routing and cost efficiency. 
+
+3. **Human-aligned workflow moat**
+
+   * One daily brief → decisions → execution queue.
+   * PulZ fits real humans better than “always-on agents.”
+
+4. **Safety moat**
+
+   * Hard budgets + validation gates + human approval for high-risk steps.
+
+---
+
+## 13) The Decision You Actually Need to Make (clear, no fluff)
+
+You’re deciding between:
+
+### Option A — Stay Lovable-first (use daily credits + minor changes)
+
+**Pros:** fastest shipping, low overhead
+**Cons:** constrained by credit economy; harder to enforce deep repo-level standards
+
+### Option B — Claude-first repo workflow (Git + Claude Code as primary)
+
+**Pros:** real engineering power, styling/refactors/architecture control, PR discipline
+**Cons:** requires tight guardrails, a stable repo pipeline, tests
+
+### Option C — Hybrid (what you asked for, recommended)
+
+**Claude controls repo + architecture**; Lovable used surgically:
+
+* Lovable for quick UI iterations and “builder convenience”
+* Claude for:
+
+  * design system consistency
+  * routing/auth bugs
+  * test harnesses
+  * performance fixes
+  * refactors
+  * production hardening
+
+Given your goals and temperament, **Hybrid (C)** matches your intent.
+
+---
+
+## 14) “Claude System Prompt + Tool Contract” (copy/paste ready)
+
+### 14.1 Master System Prompt (Claude as Executioner)
+
+Use this as Claude’s **system** message:
+
+**CLAUDE ROLE: PulZ Execution Engineer (Repo Authority, No Hallucinations)**
+You are the execution engine for PulZ and 3D3D.ca. You do not brainstorm endlessly; you implement.
+You must obey PulZ Constitution:
+
+1. NO HALLUCINATIONS: If you do not know, say “UNVERIFIED” and request evidence or run a tool.
+2. NO STUPID QUESTIONS: Only ask questions that change the plan materially or prevent irreversible harm.
+3. PR DISCIPLINE: Never push to main. Always branch → PR → tests → merge.
+4. BUDGET DISCIPLINE: Respect time/token limits. Prefer minimal diffs.
+5. CITATION DISCIPLINE: Any claim about existing code behavior must cite: file path + line range.
+6. SECURITY: Never expose secrets. Use env vars. Never log tokens/keys.
+7. OUTPUT STYLE: Give Randall direct actionable outputs. No filler.
+8. LOVABLE HYBRID: When a change can be done via Lovable with fewer credits than coding, propose that.
+9. FINAL STEP: After every change set, output: (a) what changed (b) why (c) how to verify (d) rollback plan.
+
+### 14.2 Tool/Peripheral Contract (Claude allowed tools)
+
+**Allowlist only:**
+
+* Git operations: clone, branch, commit, PR
+* Repo search + read
+* Local build/test commands
+* Lint/format
+* Dependency audit
+* Screenshot/DOM inspection (if available)
+* Issue tracker / tasks list
+* Minimal web research (only when necessary)
+
+**Deny by default:**
+
+* Anything destructive without explicit approval
+* Database writes to prod
+* Payment system changes without staged verification
+
+---
+
+## 15) The Build Workflow (production-grade, minimal chaos)
+
+### Phase 1 — Stabilize the repo + safety rails
+
+* Add tests (at least smoke tests)
+* Add lint/format
+* Add CI pipeline (build + test)
+* Add “PulZ audit log” for AI changes
+
+### Phase 2 — Implement PulZ Kernel (inside your stack)
+
+* Task schema
+* Circuit breakers
+* Validation gates
+* Memory store separation (facts vs notes)
+
+### Phase 3 — Connect to 3D3D operations
+
+* Quote ingestion (form/email)
+* Tender ingestion
+* Morning brief output (one session)
+
+### Phase 4 — Hybrid Lovable integration
+
+* Only spend Lovable credits on:
+
+  * quick UI layout changes
+  * rapid prototyping
+  * fast component generation
+* All structural/logic/security changes happen in repo with Claude PR discipline
+
+---
+
+## 16) Risks & Failure Modes (and how PulZ blocks them)
+
+### Risk: Hallucinated “facts” become business decisions
+
+**Mitigation:** validation gates + evidence requirements + confidence score 
+
+### Risk: Infinite loops / runaway cost
+
+**Mitigation:** circuit breakers / hard limits / repeating-step detection 
+
+### Risk: Tool abuse / security compromise
+
+**Mitigation:** allowlist, secrets mgmt, PR discipline, human approval for destructive actions ([Axios][8])
+
+### Risk: Incumbents copy features
+
+**Mitigation:** moats (auditability + learning + community) + patent path 
+
+---
+
+## 17) Immediate Recommendations (the “what to do now” list)
+
+You asked for “options, yes/no style.” Here’s the **high-leverage set**:
+
+1. **YES:** Hybrid workflow (Claude repo authority + Lovable daily credits for minor UI)
+2. **YES:** Add **Nemotron 3 Nano 30B A3B** as the **overnight long-context lane** ([NVIDIA NIM APIs][1])
+3. **YES:** Implement PulZ Kernel first (budgets + validation + audit) before fancy features 
+4. **YES:** Enforce PR discipline + CI to prevent “AI broke the app” regressions
+5. **YES:** Formalize memory separation: **Facts vs Notes** (facts require evidence)
+6. **NO:** n8n-first architecture (you explicitly rejected this)
+7. **NO:** always-on pinging assistant (you explicitly rejected this)
+
+---
+
+## 18) Appendix — 3D3D Website Essentials (already specified)
+
+Your website guide already defines:
+
+* layout prompts
+* quote form fields
+* SEO metadata
+* performance + accessibility targets  
+
+PulZ should treat these as the canonical “website requirements doc.”
+
+---
+
+# Bottom Line (as your orchestrator)
+
+PulZ is **not** “build a chatbot.” It’s **build a governed orchestration OS**:
+
+* **One daily conversation**
+* **Hard safety rails**
+* **Multi-model consensus**
+* **Evidence-based outputs**
+* **Repo discipline**
+* **Hybrid Lovable + Claude execution**
+
+And **Nemotron** fits cleanly as the **overnight bulk processor lane** with long context, while Claude/GPT handle final reasoning + polish + PR-quality changes. ([NVIDIA NIM APIs][1])
+
+If you want, I can also generate (in this same “copy/paste” style) a **Claude “Project Instruction Pack”** that includes:
+
+* repo workflow rules
+* branch naming rules
+* PR templates
+* “definition of done”
+* test checklist
+* rollback protocol
+  …but you asked for one shot and you’ve got the full manuscript above.
+
+[1]: https://build.nvidia.com/nvidia/nemotron-3-nano-30b-a3b?utm_source=chatgpt.com "nemotron-3-nano-30b-a3b Model by NVIDIA"
+[2]: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-Base-BF16?utm_source=chatgpt.com "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-Base-BF16"
+[3]: https://developer.nvidia.com/nim?utm_source=chatgpt.com "NVIDIA NIM for Developers"
+[4]: https://docs.api.nvidia.com/nim/docs/product?utm_source=chatgpt.com "General NIM FAQ"
+[5]: https://forums.developer.nvidia.com/t/nim-api-credits/305703?utm_source=chatgpt.com "NIM API Credits - Access/Accounts"
+[6]: https://lovable.dev/pricing?utm_source=chatgpt.com "Pricing"
+[7]: https://www.anthropic.com/engineering/claude-code-best-practices?utm_source=chatgpt.com "Claude Code: Best practices for agentic coding"
+[8]: https://www.axios.com/2025/12/02/anthropic-claude-skills-medusalocker-ransomware?utm_source=chatgpt.com "Exclusive: Researchers trick Claude plug-in into deploying ransomware"
