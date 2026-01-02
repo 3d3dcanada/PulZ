@@ -68,6 +68,50 @@ export function seedIncidentLog(): void {
       },
       closedAt: '2025-01-02T19:30:00Z',
     })
+
+    // Add operator boundary bypass incident
+    INCIDENT_LOG.push({
+      incident: {
+        id: 'INC-2025-002',
+        timestamp: '2025-01-03T00:00:00Z',
+        description: 'Operator boundary bypass via direct navigation',
+        deploymentMode: 'custom_domain',
+        probableCauses: [
+          'Access gate implemented only on root page (/)',
+          'Navigation links accessible without authorization',
+          'Direct URLs could bypass the gate entirely',
+          'No global boundary enforcement at layout level',
+        ],
+        status: 'resolved',
+        checks: [
+          {
+            passed: false,
+            message: 'Operator boundary not enforced globally',
+            details: 'AccessGate component only rendered on page.tsx. Navigation and other pages were reachable directly.',
+            timestamp: '2025-01-03T00:00:00Z',
+          },
+          {
+            passed: false,
+            message: 'Deep links bypass operator acknowledgment',
+            details: 'Visiting /learning, /settings, or /entry directly showed full UI without passing through gate.',
+            timestamp: '2025-01-03T00:00:00Z',
+          },
+          {
+            passed: false,
+            message: 'Navigation functional before authorization',
+            details: 'Header navigation allowed full system traversal without acknowledgment.',
+            timestamp: '2025-01-03T00:00:00Z',
+          },
+        ],
+      },
+      resolution: {
+        rootCause: 'Access control was page-specific rather than system-wide. The boundary needed to exist at the highest architectural level (layout) to ensure nothing could render or be navigated to before operator acknowledgment.',
+        preventionGate: 'Implemented global OperatorBoundary component at layout level. Created keyring.ts as single source of access truth. Lobby UI replaces passcode-only gate with clear explanation of purpose and limitations. All navigation now blocked until acknowledgment is granted.',
+        verifiedAt: '2025-01-03T00:30:00Z',
+        verifiedBy: 'cto.new',
+      },
+      closedAt: '2025-01-03T00:30:00Z',
+    })
   }
 }
 
