@@ -34,7 +34,7 @@ export default function Navigation() {
 
           <div className="hidden md:flex space-x-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))
               return (
                 <Link
                   key={item.href}
@@ -49,7 +49,7 @@ export default function Navigation() {
                   {isActive && (
                     <motion.div
                       layoutId="activeNav"
-                      className="absolute inset-0 bg-control-accent/10 border border-control-accent/30 rounded-md"
+                      className="absolute inset-0 bg-white/5 border border-white/10 rounded-md shadow-inner"
                       initial={false}
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />

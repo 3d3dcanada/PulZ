@@ -18,23 +18,24 @@
 
 @layer utilities {
   .glass-panel {
-    @apply bg-control-surface/40 backdrop-blur-md border border-control-border/50 rounded-lg;
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-control transition-all duration-300;
   }
 
   .glass-panel-bright {
-    @apply bg-control-surface/60 backdrop-blur-lg border border-control-border shadow-glass;
+    @apply bg-white/[0.07] backdrop-blur-2xl border border-white/[0.12] rounded-xl shadow-glass transition-all duration-300;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-control-accent to-gate-consensus bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-control-accent via-white to-gate-consensus bg-clip-text text-transparent;
   }
 
   .glow {
-    text-shadow: 0 0 20px currentColor;
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
   }
 
   .control-button {
-    @apply glass-panel px-6 py-3 hover:bg-control-surface/60 transition-all duration-200 
-           border-control-border/70 hover:border-control-accent/50 cursor-pointer;
+    @apply glass-panel px-6 py-3 hover:bg-white/[0.08] active:scale-[0.98] transition-all duration-200 
+           border-white/[0.1] hover:border-control-accent/50 cursor-pointer font-medium text-sm tracking-wide;
   }
 }

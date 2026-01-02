@@ -2,12 +2,14 @@
 
 import { motion } from 'framer-motion'
 import GateValidator from '@/components/GateValidator'
+import SystemMap from '@/components/SystemMap'
 
 const gates = [
   {
     number: 1,
     name: 'Structural Gate',
-    color: 'gate-structural',
+    color: 'text-gate-structural',
+    bg: 'bg-gate-structural/20',
     description: 'Schema Validation',
     purpose: 'Output must conform to predefined schema',
     process: [
@@ -26,7 +28,8 @@ const gates = [
   {
     number: 2,
     name: 'Evidence Gate',
-    color: 'gate-evidence',
+    color: 'text-gate-evidence',
+    bg: 'bg-gate-evidence/20',
     description: 'Citation & Proof Required',
     purpose: 'Claims affecting money, safety, compliance need evidence',
     process: [
@@ -45,7 +48,8 @@ const gates = [
   {
     number: 3,
     name: 'Consistency Gate',
-    color: 'gate-consistency',
+    color: 'text-gate-consistency',
+    bg: 'bg-gate-consistency/20',
     description: 'No Contradictions',
     purpose: 'Check against context, memory, and business rules',
     process: [
@@ -64,7 +68,8 @@ const gates = [
   {
     number: 4,
     name: 'Consensus Gate',
-    color: 'gate-consensus',
+    color: 'text-gate-consensus',
+    bg: 'bg-gate-consensus/20',
     description: 'Multi-Model Critique',
     purpose: 'Second model critiques primary output',
     process: [
@@ -86,6 +91,8 @@ export default function SafetyPage() {
   return (
     <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
+        <SystemMap />
+        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -114,54 +121,55 @@ export default function SafetyPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
+          className="mb-16"
         >
           <h2 className="text-2xl font-bold mb-8 text-control-accent">
             Gate Details
           </h2>
-          <div className="space-y-8">
+          <div className="grid lg:grid-cols-2 gap-8">
             {gates.map((gate, index) => (
               <motion.div
                 key={gate.number}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 className="glass-panel-bright p-8"
               >
                 <div className="flex items-start mb-6">
                   <div
-                    className={`w-16 h-16 rounded-lg bg-${gate.color}/20 flex items-center justify-center mr-6 flex-shrink-0`}
+                    className={`w-16 h-16 rounded-xl ${gate.bg} flex items-center justify-center mr-6 flex-shrink-0 border border-white/5`}
                   >
-                    <span className={`text-${gate.color} font-bold text-2xl`}>
+                    <span className={`${gate.color} font-bold text-2xl`}>
                       {gate.number}
                     </span>
                   </div>
                   <div className="flex-grow">
-                    <h3 className={`text-2xl font-bold mb-2 text-${gate.color}`}>
+                    <h3 className={`text-2xl font-bold mb-2 ${gate.color}`}>
                       {gate.name}
                     </h3>
-                    <p className="text-control-text-secondary text-lg">
+                    <p className="text-control-text-secondary">
                       {gate.description}
                     </p>
                   </div>
                 </div>
 
                 <div className="mb-6">
-                  <h4 className="text-sm font-semibold text-control-accent mb-3">
-                    PURPOSE
+                  <h4 className="text-xs font-bold tracking-widest text-control-accent mb-3 uppercase">
+                    Purpose
                   </h4>
-                  <p className="text-control-text-secondary">
+                  <p className="text-control-text-secondary text-sm leading-relaxed">
                     {gate.purpose}
                   </p>
                 </div>
 
                 <div className="mb-6">
-                  <h4 className="text-sm font-semibold text-control-accent mb-3">
-                    PROCESS
+                  <h4 className="text-xs font-bold tracking-widest text-control-accent mb-3 uppercase">
+                    Process
                   </h4>
                   <ul className="space-y-2">
                     {gate.process.map((step, idx) => (
-                      <li key={idx} className="flex items-start text-sm">
+                      <li key={idx} className="flex items-start text-xs">
                         <span className="text-control-accent mr-2">→</span>
                         <span className="text-control-text-muted">{step}</span>
                       </li>
@@ -169,11 +177,11 @@ export default function SafetyPage() {
                   </ul>
                 </div>
 
-                <div className="glass-panel p-6 bg-control-bg/60">
-                  <h4 className="text-sm font-semibold text-control-accent mb-3">
-                    EXAMPLE
+                <div className="glass-panel p-6 bg-black/20">
+                  <h4 className="text-xs font-bold tracking-widest text-control-accent mb-3 uppercase">
+                    Example Trace
                   </h4>
-                  <div className="space-y-3 text-sm">
+                  <div className="space-y-3 text-xs">
                     <div>
                       <span className="text-control-text-muted">Input: </span>
                       <span className="text-control-text-secondary font-mono">
@@ -187,7 +195,7 @@ export default function SafetyPage() {
                       </span>
                     </div>
                     <div>
-                      <span className="text-control-success">Outcome: </span>
+                      <span className="text-control-success font-semibold">Outcome: </span>
                       <span className="text-control-text-secondary font-semibold">
                         {gate.example.outcome}
                       </span>
@@ -196,6 +204,46 @@ export default function SafetyPage() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </motion.section>
+
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="glass-panel-bright p-8 border-l-4 border-control-accent"
+        >
+          <h2 className="text-2xl font-bold mb-6 text-control-accent">
+            Governance Hardening
+          </h2>
+          <div className="grid md:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-lg font-bold mb-4">Evidence Grounding</h3>
+              <p className="text-control-text-secondary text-sm leading-relaxed mb-4">
+                No claim leaves the system without explicit grounding. Every assertion is tagged:
+              </p>
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 rounded-full bg-control-success" />
+                  <span className="text-control-text-primary font-medium">Evidence-backed</span>
+                  <span className="text-control-text-muted">(Citations provided)</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 rounded-full bg-control-warning" />
+                  <span className="text-control-text-primary font-medium">Configurable Assumption</span>
+                  <span className="text-control-text-muted">(Based on your rules)</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">Human-in-the-Loop</h3>
+              <p className="text-control-text-secondary text-sm leading-relaxed">
+                The gates are automated, but the authority is human. If a gate cannot resolve 
+                a conflict with 100% certainty, it escalates. The system is designed to stop, 
+                not to guess.
+              </p>
+            </div>
           </div>
         </motion.section>
       </div>

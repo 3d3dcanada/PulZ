@@ -41,43 +41,43 @@ export default function LaneFlow() {
 
   return (
     <div className="glass-panel-bright p-8">
-      <p className="text-control-text-secondary mb-8 text-center">
-        The quote lane demonstrates how PulZ handles real business operations
-        with validation, routing, and approval at each stage.
+      <p className="text-control-text-secondary mb-12 text-center text-sm max-w-xl mx-auto leading-relaxed">
+        The quote lane demonstrates how PulZ handles business operations
+        with multi-stage validation and explicit human authority.
       </p>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {steps.map((stepData, index) => (
           <motion.div
             key={index}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.5 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05, duration: 0.5 }}
           >
             <button
               onClick={() => setActiveStep(activeStep === index ? null : index)}
-              className="w-full text-left"
+              className="w-full text-left focus:outline-none group"
             >
               <div
-                className={`glass-panel p-6 cursor-pointer transition-all duration-300 ${
-                  activeStep === index ? 'border-control-accent' : ''
+                className={`glass-panel p-5 cursor-pointer transition-all duration-300 border-white/5 ${
+                  activeStep === index ? 'border-control-accent bg-white/[0.08]' : 'hover:bg-white/[0.04]'
                 }`}
               >
                 <div className="flex items-center">
                   <div className="flex items-center flex-grow">
-                    <div className="w-12 h-12 rounded-lg bg-control-accent/20 flex items-center justify-center mr-4 flex-shrink-0">
-                      <span className="text-2xl">{stepData.icon}</span>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 border border-white/5 ${activeStep === index ? 'bg-control-accent text-white' : 'bg-white/5 text-control-text-muted'}`}>
+                      <span className="text-lg">{stepData.icon}</span>
                     </div>
                     <div className="flex-grow">
-                      <div className="flex items-center mb-1">
-                        <span className="text-control-accent font-bold text-sm mr-2">
-                          Step {index + 1}
+                      <div className="flex items-center mb-0.5">
+                        <span className="text-control-accent font-mono text-[10px] font-bold mr-2 uppercase tracking-tighter">
+                          Stage 0{index + 1}
                         </span>
-                        <h3 className="text-lg font-bold text-control-text-primary">
+                        <h3 className={`text-sm font-bold transition-colors ${activeStep === index ? 'text-control-accent' : 'text-control-text-primary'}`}>
                           {stepData.step}
                         </h3>
                       </div>
-                      <p className="text-control-text-muted text-sm">
+                      <p className="text-control-text-muted text-[11px] leading-tight">
                         {stepData.description}
                       </p>
                     </div>
@@ -85,38 +85,36 @@ export default function LaneFlow() {
                   <motion.div
                     animate={{ rotate: activeStep === index ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
-                    className="text-control-accent ml-4"
+                    className={`ml-4 text-xs ${activeStep === index ? 'text-control-accent' : 'text-control-text-muted'}`}
                   >
                     ▼
                   </motion.div>
                 </div>
 
-                {activeStep === index && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mt-4 pt-4 border-t border-control-border/50"
-                  >
-                    <div className="glass-panel p-4 bg-control-bg/60">
-                      <h4 className="text-sm font-semibold text-control-accent mb-2">
-                        DETAILED PROCESS
-                      </h4>
-                      <div className="text-sm text-control-text-muted">
-                        {getStepDetails(index)}
+                <AnimatePresence>
+                  {activeStep === index && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-4 pt-4 border-t border-white/10">
+                        <div className="glass-panel p-4 bg-black/40 border-white/5">
+                          <h4 className="text-[10px] font-bold text-control-accent mb-2 uppercase tracking-[0.2em]">
+                            System Trace
+                          </h4>
+                          <div className="text-[11px] text-control-text-secondary leading-relaxed">
+                            {getStepDetails(index)}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </button>
-
-            {index < steps.length - 1 && (
-              <div className="flex justify-center py-2">
-                <div className="w-0.5 h-8 bg-gradient-to-b from-control-accent to-control-border" />
-              </div>
-            )}
           </motion.div>
         ))}
       </div>

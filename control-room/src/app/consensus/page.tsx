@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import ConsensusVisualizer from '@/components/ConsensusVisualizer'
+import SystemMap from '@/components/SystemMap'
 
 const scenarios = [
   {
@@ -14,6 +15,7 @@ const scenarios = [
       { name: 'Gemini', position: 'Approve quote at $450' },
     ],
     result: 'CONSENSUS → Confidence: 95%',
+    color: 'text-control-success',
   },
   {
     title: 'Minor Disagreement',
@@ -25,6 +27,7 @@ const scenarios = [
       { name: 'Gemini', position: 'Quote $475, 5-day timeline' },
     ],
     result: 'PARTIAL CONSENSUS → Present options to user',
+    color: 'text-gate-consensus',
   },
   {
     title: 'Strong Disagreement',
@@ -36,6 +39,7 @@ const scenarios = [
       { name: 'Gemini', position: 'Request more information first' },
     ],
     result: 'NO CONSENSUS → Confidence: 35% → Escalate',
+    color: 'text-control-error',
   },
 ]
 
@@ -43,6 +47,8 @@ export default function ConsensusPage() {
   return (
     <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
+        <SystemMap />
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -74,66 +80,30 @@ export default function ConsensusPage() {
           className="mb-16"
         >
           <h2 className="text-2xl font-bold mb-8 text-control-accent">
-            How Consensus Works
+            The Consensus Engine
           </h2>
-          <div className="glass-panel-bright p-8">
-            <ol className="space-y-6">
-              <li className="flex items-start">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-control-accent/20 text-control-accent font-bold mr-4 flex-shrink-0">
-                  1
-                </span>
-                <div>
-                  <h3 className="font-semibold text-control-text-primary mb-2">
-                    Primary Model Generates Output
-                  </h3>
-                  <p className="text-control-text-muted text-sm">
-                    The primary model (e.g., Claude) generates a proposed action, decision, or response.
-                  </p>
+          <div className="grid md:grid-cols-4 gap-4">
+            {[
+              { step: 'Generate', title: 'Primary model', desc: 'Claude proposes action' },
+              { step: 'Critique', title: 'Secondary models', desc: 'GPT-4 / Gemini review' },
+              { step: 'Compare', title: 'Agreement map', desc: 'Identify shared truth' },
+              { step: 'Decide', title: 'Decision point', desc: 'Strong agreement or escalate' },
+            ].map((item, idx) => (
+              <div key={idx} className="glass-panel p-6 border-white/5 relative overflow-hidden">
+                <div className="text-[40px] font-bold text-white/5 absolute -bottom-4 -right-2 select-none">
+                  {idx + 1}
                 </div>
-              </li>
-              <li className="flex items-start">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-control-accent/20 text-control-accent font-bold mr-4 flex-shrink-0">
-                  2
-                </span>
-                <div>
-                  <h3 className="font-semibold text-control-text-primary mb-2">
-                    Critique Models Review
-                  </h3>
-                  <p className="text-control-text-muted text-sm">
-                    Secondary models (e.g., GPT-4, Gemini) independently critique the output, checking for
-                    missing assumptions, logic holes, and risks.
-                  </p>
+                <div className="text-[10px] font-bold text-control-accent uppercase tracking-widest mb-2">
+                  {item.step}
                 </div>
-              </li>
-              <li className="flex items-start">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-control-accent/20 text-control-accent font-bold mr-4 flex-shrink-0">
-                  3
-                </span>
-                <div>
-                  <h3 className="font-semibold text-control-text-primary mb-2">
-                    Agreement Map Generated
-                  </h3>
-                  <p className="text-control-text-muted text-sm">
-                    PulZ compares all model outputs and creates a map: what everyone agrees on,
-                    where they differ, and what&apos;s contested.
-                  </p>
+                <div className="text-sm font-bold text-control-text-primary mb-1">
+                  {item.title}
                 </div>
-              </li>
-              <li className="flex items-start">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-control-accent/20 text-control-accent font-bold mr-4 flex-shrink-0">
-                  4
-                </span>
-                <div>
-                  <h3 className="font-semibold text-control-text-primary mb-2">
-                    Decision Point
-                  </h3>
-                  <p className="text-control-text-muted text-sm">
-                    If consensus is strong, proceed with confidence boost. If disagreement is significant,
-                    escalate to human for tiebreak. Never choose silently.
-                  </p>
+                <div className="text-xs text-control-text-muted leading-relaxed">
+                  {item.desc}
                 </div>
-              </li>
-            </ol>
+              </div>
+            ))}
           </div>
         </motion.section>
 
@@ -144,47 +114,44 @@ export default function ConsensusPage() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-2xl font-bold mb-8 text-control-accent">
-            Consensus Scenarios
+            Conflict Surface Examples
           </h2>
-          <div className="space-y-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {scenarios.map((scenario, index) => (
               <motion.div
                 key={scenario.title}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, scale: 0.98 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="glass-panel-bright p-6"
+                className="glass-panel-bright p-6 flex flex-col"
               >
-                <h3 className="text-xl font-bold mb-2 text-control-text-primary">
+                <h3 className="text-lg font-bold mb-1 text-control-text-primary">
                   {scenario.title}
                 </h3>
-                <p className="text-control-text-secondary mb-4">
+                <p className="text-xs text-control-text-secondary mb-4 leading-relaxed h-8">
                   {scenario.description}
                 </p>
                 
-                <div className="space-y-3 mb-4">
+                <div className="space-y-2 mb-6 flex-grow">
                   {scenario.models.map((model, idx) => (
-                    <div key={idx} className="glass-panel p-3 bg-control-bg/40">
-                      <span className="text-control-accent font-semibold text-sm mr-2">
-                        {model.name}:
-                      </span>
-                      <span className="text-control-text-muted text-sm">
-                        {model.position}
-                      </span>
+                    <div key={idx} className="glass-panel p-3 bg-black/20 border-white/5">
+                      <div className="text-[9px] font-bold text-control-accent uppercase tracking-widest mb-1">
+                        {model.name}
+                      </div>
+                      <div className="text-[10px] text-control-text-secondary font-mono leading-tight">
+                        &quot;{model.position}&quot;
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="flex items-start justify-between">
-                  <div className="flex-grow">
-                    <div className="text-sm text-control-text-muted mb-2">
-                      <span className="font-semibold text-control-accent">Outcome: </span>
-                      {scenario.outcome}
-                    </div>
-                    <div className="text-sm font-mono text-control-success">
-                      {scenario.result}
-                    </div>
+                <div className="pt-4 border-t border-white/5">
+                  <div className="text-[10px] text-control-text-muted mb-2 font-medium">
+                    OUTCOME: <span className="text-control-text-secondary">{scenario.outcome}</span>
+                  </div>
+                  <div className={`text-[10px] font-mono font-bold ${scenario.color} bg-black/30 p-2 rounded border border-white/5`}>
+                    {scenario.result}
                   </div>
                 </div>
               </motion.div>
