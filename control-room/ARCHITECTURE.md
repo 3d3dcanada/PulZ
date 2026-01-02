@@ -422,7 +422,200 @@ const nextConfig = {
 - Target: >90 on all metrics
 - Bundle size monitoring
 
-## Future Enhancements
+## Kernel Architecture
+
+### Overview
+
+The PulZ Control Room implements a **kernel layer** that enforces governance through code and data flow, not UI language. The kernel makes it structurally impossible to:
+
+- Execute actions without explicit approval
+- Make recommendations without evidence
+- Bypass confidence thresholds
+- Rewrite decision history
+
+### Kernel Responsibilities
+
+The kernel is responsible for:
+
+1. **Primitive Data Structures**: Defining immutable, validated types for evidence, decisions, and audit events
+2. **Policy Enforcement**: Evaluating confidence scores and enforcing governance rules at the data layer
+3. **State Transitions**: Validating all decision status changes and rejecting invalid transitions
+4. **Audit Trail**: Maintaining an append-only, cryptographically chained log of all governance events
+
+### Core Primitives
+
+#### EvidenceItem
+
+Every piece of evidence has:
+- **Type**: `document | user_input | external_source | system_observation`
+- **Source**: Must include `kind` and `ref` (e.g., filename + section)
+- **Excerpt**: Non-empty text excerpt
+- **Confidence Weight**: 0-1 score indicating quality
+- **Verified**: Boolean flag for verification status
+
+#### EvidenceReport
+
+A collection of evidence items with:
+- **Items**: Array of EvidenceItem (minimum 1 required)
+- **Coverage Summary**: Description of what is covered
+- **Confidence Score**: 0-100 derived from items via policy
+- **Limitations**: Explicit list of gaps
+- **Assumptions**: Explicit list of assumptions
+
+Validator ensures:
+- At least one evidence item exists
+- All items have non-empty sources and excerpts
+- Confidence score is calculated via policy, not hand-waved
+
+#### ConfidenceRubric
+
+The rubric is encoded as immutable policy:
+
+| Score | Action Class | Rules |
+|-------|--------------|-------|
+| 0-49 | `blocked` | All actions blocked |
+| 50-69 | `approval_required_reversible` | Approval required, reversible only |
+| 70-89 | `approval_required_reversible` | Approval required, reversible only |
+| 90-100 | `automation_eligible` | Automation eligible only if explicitly enabled |
+
+Policy functions:
+- `getActionClass(score)`: Returns action class
+- `getAllowedActions(score)`: Returns permitted actions
+- `getBlockedActions(score)`: Returns forbidden actions
+- `getRiskLevel(score)`: Returns low/medium/high
+
+#### DecisionFrame
+
+The core governance primitive:
+- **Objective**: What is being decided
+- **Recommendation**: Proposed action
+- **Evidence Report ID**: Required reference to evidence
+- **Confidence Score**: Inherited from evidence report
+- **Risk Level**: Derived from confidence (low/medium/high)
+- **Allowed Actions**: Array of permitted actions (policy-derived)
+- **Blocked Actions**: Array of forbidden actions (policy-derived)
+- **Approval Required**: Always `true` (hardcoded invariant)
+- **Status**: One of `draft | pending_review | approved | rejected | revoked`
+- **Approver ID**: Required for approved/rejected/revoked states
+- **Approval Timestamp**: Required for approved/rejected/revoked states
+
+Status transitions are validated:
+- `draft` → `pending_review`
+- `pending_review` → `approved | rejected`
+- `approved` → `revoked`
+- `rejected` → (terminal)
+- `revoked` → (terminal)
+
+Attempting an invalid transition throws an error at the kernel level.
+
+#### AuditEvent
+
+Every state change produces an immutable audit event:
+- **Event Type**: e.g., `decision_approved`, `evidence_report_created`
+- **Actor**: `human | system | model` with optional ID
+- **Related Entity**: Kind + ID of the object affected
+- **Before Hash**: Cryptographic hash of previous event
+- **After Hash**: Cryptographic hash of new state
+- **Timestamp**: ISO 8601 timestamp
+- **Notes**: Optional human-readable context
+
+### Structural Invariants
+
+#### 1. No Silent Execution
+
+```typescript
+if (frame.status === 'approved') {
+  if (!frame.approver_id || !frame.approval_timestamp) {
+    throw new Error('Approval requires explicit human artifact')
+  }
+}
+```
+
+The kernel validator rejects any DecisionFrame marked as approved without both `approver_id` and `approval_timestamp`. There is no code path that allows execution without these fields.
+
+#### 2. Evidence Gating
+
+```typescript
+if (!frame.evidence_report_id || frame.evidence_report_id.trim() === '') {
+  violations.push('Decision must reference a valid evidence report')
+}
+```
+
+Every DecisionFrame must reference an EvidenceReport. Claims without evidence must be explicitly labeled in the report's `assumptions` array.
+
+#### 3. Confidence Gating
+
+```typescript
+if (confidenceScore < 50) {
+  return { action_class: 'blocked', allowed_actions: [] }
+}
+```
+
+The confidence policy is code, not configuration. Scores below 50 result in an empty `allowed_actions` array, making execution structurally impossible.
+
+#### 4. Append-Only Audit
+
+```typescript
+class AppendOnlyLog {
+  append(event) { /* ... */ }
+  // No delete, update, or clear methods
+}
+```
+
+The `AppendOnlyLog` class only exposes `append()`. Revocation is a new event, not a deletion. The full history is preserved and verifiable via hash chain.
+
+### What PulZ Will Never Do
+
+These guarantees are structural, not aspirational:
+
+1. **Never execute without approval**: `approval_required` is hardcoded to `true` in `DecisionFrame`. There is no branch that sets it to `false`.
+
+2. **Never recommend without evidence**: `validateDecisionFrame()` requires a non-empty `evidence_report_id`. Validation fails if missing.
+
+3. **Never bypass confidence thresholds**: `evaluateConfidencePolicy()` returns blocked actions for scores below 50. The UI cannot override this.
+
+4. **Never rewrite history**: `AppendOnlyLog` has no delete/update methods. Revocation appends a new event with `status: 'revoked'`.
+
+5. **Never allow invalid transitions**: `canTransition()` is consulted before any status change. The state machine is enforced at the primitive level.
+
+### Kernel File Structure
+
+```
+control-room/kernel/
+├── primitives/
+│   ├── EvidenceItem.ts
+│   ├── EvidenceReport.ts
+│   ├── DecisionFrame.ts
+│   ├── ConfidenceRubric.ts
+│   └── AuditEvent.ts
+├── policies/
+│   ├── confidencePolicy.ts
+│   └── governancePolicy.ts
+├── validators/
+│   ├── evidenceValidator.ts
+│   └── decisionValidator.ts
+├── audit/
+│   ├── appendOnlyLog.ts
+│   └── hash.ts
+└── index.ts
+```
+
+### Integration with UI
+
+The kernel is consumed by UI components but never bypassed:
+
+1. **Decision workflows** use `createDecisionFrame()` to generate frames with policy-derived constraints
+2. **Evidence displays** use `validateEvidenceReport()` to ensure integrity
+3. **Approval flows** use `approveDecisionFrame()` which enforces status transitions
+4. **Audit trails** read from `globalAuditLog.getEvents()` (read-only access)
+
+The UI cannot:
+- Create a DecisionFrame without an evidence report
+- Approve a decision without providing approver_id
+- Skip status transitions (draft → approved is blocked)
+- Delete or modify audit events
+
+### Future Enhancements
 
 ### Potential Additions
 - [ ] Dark/light mode toggle (currently dark only)
