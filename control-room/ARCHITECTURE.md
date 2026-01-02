@@ -4,6 +4,25 @@
 
 This is a static Next.js site that demonstrates the PulZ AI Orchestration OS governance model through interactive components. No backend, no API calls, pure client-side JavaScript with React and Framer Motion.
 
+## Governance Hardening
+
+PulZ implements a "Trust, but Verify" architecture. The following hardening principles are baked into the core design:
+
+### 1. Evidence-Gated Execution
+Every action proposed by the system must be backed by a "Truth Model" criterion (Direct Observation, User-Confirmed Fact, Cited Source, or Consensus Inference). Without this grounding, the action state is locked.
+
+### 2. Multi-Model Consensus
+We do not trust a single LLM for critical business logic. Every output from a Primary Model is critiqued by at least two distinct models (e.g., Claude reviewed by GPT-4 and Gemini). If agreement falls below 70%, the system halts and escalates to human review.
+
+### 3. Human Authority Invariants
+The system is designed with a "No Silent Autonomy" rule. Irreversible actions, financial transactions, and low-confidence decisions are hard-gated. The UI reflects this by never implying that an action will happen without explicit human approval.
+
+### 4. Deterministic Circuit Breakers
+Beyond AI logic, the system enforces deterministic boundaries:
+- **Budget Breakers**: Hard caps on API spend and token usage.
+- **Loop Detection**: Stops recursive AI logic patterns.
+- **Trace Auditability**: Every decision is stored with its full validation trace (all 4 gates).
+
 ## Technology Stack
 
 ### Core Framework

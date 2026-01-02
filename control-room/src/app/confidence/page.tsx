@@ -2,12 +2,14 @@
 
 import { motion } from 'framer-motion'
 import ConfidenceSlider from '@/components/ConfidenceSlider'
+import SystemMap from '@/components/SystemMap'
 
 const thresholds = [
   {
     range: '90–100',
     level: 'Auto-Safe',
-    color: 'control-success',
+    colorClass: 'text-control-success',
+    bgClass: 'bg-control-success/20',
     action: 'Proceed automatically',
     examples: [
       'Database query returned verified data',
@@ -18,7 +20,8 @@ const thresholds = [
   {
     range: '70–89',
     level: 'Reversible Only',
-    color: 'gate-consensus',
+    colorClass: 'text-gate-consensus',
+    bgClass: 'bg-gate-consensus/20',
     action: 'Drafts, proposals, staging changes only',
     examples: [
       'Generate draft email (not sent)',
@@ -29,7 +32,8 @@ const thresholds = [
   {
     range: '50–69',
     level: 'Approval Required',
-    color: 'control-warning',
+    colorClass: 'text-control-warning',
+    bgClass: 'bg-control-warning/20',
     action: 'User must explicitly approve',
     examples: [
       'Quote pricing based on incomplete specs',
@@ -40,7 +44,8 @@ const thresholds = [
   {
     range: '<50',
     level: 'Refuse / Escalate',
-    color: 'control-error',
+    colorClass: 'text-control-error',
+    bgClass: 'bg-control-error/20',
     action: 'Do not proceed, request clarification',
     examples: [
       'Conflicting information from sources',
@@ -77,6 +82,8 @@ export default function ConfidencePage() {
   return (
     <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
+        <SystemMap />
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -108,46 +115,45 @@ export default function ConfidencePage() {
           transition={{ duration: 0.6 }}
           className="mb-16"
         >
-          <h2 className="text-2xl font-bold mb-8 text-control-accent">
+          <h2 className="text-2xl font-bold mb-8 text-control-accent text-center">
             Confidence Thresholds
           </h2>
-          <div className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {thresholds.map((threshold, index) => (
               <motion.div
                 key={threshold.range}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="glass-panel-bright p-6"
+                className="glass-panel-bright p-6 flex flex-col"
               >
                 <div className="flex items-start mb-4">
                   <div
-                    className={`px-4 py-2 rounded-lg bg-${threshold.color}/20 mr-6`}
+                    className={`px-4 py-1.5 rounded-full ${threshold.bgClass} mr-4 border border-white/5 flex-shrink-0`}
                   >
-                    <span className={`text-${threshold.color} font-bold text-lg`}>
+                    <span className={`${threshold.colorClass} font-mono font-bold text-sm tracking-tighter`}>
                       {threshold.range}
                     </span>
                   </div>
-                  <div className="flex-grow">
-                    <h3 className={`text-xl font-bold mb-2 text-${threshold.color}`}>
+                  <div>
+                    <h3 className={`text-xl font-bold mb-1 ${threshold.colorClass}`}>
                       {threshold.level}
                     </h3>
-                    <p className="text-control-text-secondary">
-                      <span className="font-semibold">Action: </span>
-                      {threshold.action}
+                    <p className="text-control-text-secondary text-xs font-medium">
+                       {threshold.action}
                     </p>
                   </div>
                 </div>
-                <div className="glass-panel p-4 bg-control-bg/40">
-                  <div className="text-sm font-semibold text-control-accent mb-2">
-                    EXAMPLES
-                  </div>
+                <div className="glass-panel p-4 bg-black/20 mt-auto">
+                  <h4 className="text-[10px] font-bold text-control-accent mb-3 uppercase tracking-widest opacity-70">
+                    Example Scenarios
+                  </h4>
                   <ul className="space-y-2">
                     {threshold.examples.map((example, idx) => (
-                      <li key={idx} className="flex items-start text-sm">
-                        <span className="text-control-accent mr-2">→</span>
-                        <span className="text-control-text-muted">{example}</span>
+                      <li key={idx} className="flex items-start text-[11px]">
+                        <span className="text-control-accent mr-2 opacity-50">→</span>
+                        <span className="text-control-text-muted leading-tight">{example}</span>
                       </li>
                     ))}
                   </ul>
@@ -162,44 +168,39 @@ export default function ConfidencePage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
+          className="glass-panel-bright p-8"
         >
           <h2 className="text-2xl font-bold mb-8 text-control-accent">
             Scoring Factors
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {factors.map((item, index) => (
               <motion.div
                 key={item.factor}
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.98 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="glass-panel-bright p-6"
+                className="glass-panel p-6 flex flex-col"
               >
-                <h3 className="text-lg font-bold mb-4 text-control-text-primary">
+                <h3 className="text-base font-bold mb-4 text-control-text-primary h-12 flex items-center">
                   {item.factor}
                 </h3>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <div className="w-4 h-4 rounded-full bg-control-success mr-3 mt-1 flex-shrink-0" />
-                    <div>
-                      <div className="text-sm font-semibold text-control-success mb-1">
-                        High Confidence
-                      </div>
-                      <div className="text-sm text-control-text-muted">
-                        {item.high}
-                      </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-[10px] font-bold text-control-success mb-1 uppercase tracking-widest opacity-80">
+                      High Confidence
+                    </div>
+                    <div className="text-[11px] text-control-text-secondary leading-snug">
+                      {item.high}
                     </div>
                   </div>
-                  <div className="flex items-start">
-                    <div className="w-4 h-4 rounded-full bg-control-error mr-3 mt-1 flex-shrink-0" />
-                    <div>
-                      <div className="text-sm font-semibold text-control-error mb-1">
-                        Low Confidence
-                      </div>
-                      <div className="text-sm text-control-text-muted">
-                        {item.low}
-                      </div>
+                  <div>
+                    <div className="text-[10px] font-bold text-control-error mb-1 uppercase tracking-widest opacity-80">
+                      Low Confidence
+                    </div>
+                    <div className="text-[11px] text-control-text-secondary leading-snug">
+                      {item.low}
                     </div>
                   </div>
                 </div>

@@ -30,6 +30,31 @@ PulZ is built on four non-negotiables:
 3. **No stupid questions** — context aware
 4. **Maximum time back** — decision ready
 
+## 💼 Investor Quick-Look (60-Second Path)
+
+If you have one minute, follow this path to understand the PulZ trust model:
+
+1.  **[Philosophy](/philosophy)**: Understand the "Truth Model" — PulZ only acts on direct observations, cited sources, or your explicit confirmation.
+2.  **[Safety Gates](/safety)**: Run the "Interactive Gate Validation" to see the sequential filters (Structural, Evidence, Consistency, Consensus) every output must pass.
+3.  **[Consensus](/consensus)**: View how we handle AI disagreement. We surface conflicts rather than hiding them, ensuring you remain the ultimate authority.
+4.  **[Confidence](/confidence)**: See the scoring engine that determines what is "Auto-Safe" and what requires your signature.
+
+## 🛡️ Governance Guarantees
+
+PulZ is engineered with hard boundaries to ensure trust and durability.
+
+### What PulZ Will Never Do
+- **Never act on unverified claims**: If a claim has no evidence or citation, it is blocked or escalated.
+- **Never hide disagreement**: If model consensus is below 70%, the conflict is surfaced to the human.
+- **Never exceed budgets**: Hard circuit breakers on cost, tokens, and time are enforced at the kernel level.
+- **Never hallucinate silently**: The 4-gate system rejects any output that fails schema or consistency checks.
+
+### What Always Requires Human Approval
+- **Material financial decisions**: Any action involving money above a configurable threshold.
+- **Irreversible state changes**: Deleting data, sending major communications, or changing core business rules.
+- **Low-confidence outcomes**: Any output where the integrated confidence score is below 70%.
+- **Novel scenarios**: Tasks that don't match historical patterns or explicit instructions.
+
 ## 🏗️ Built With
 
 - **Framework**: Next.js 14 with TypeScript

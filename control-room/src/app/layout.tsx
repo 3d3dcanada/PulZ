@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   keywords: 'AI orchestration, governance, anti-hallucination, multi-model AI, consensus, validation',
   authors: [{ name: '3D3D.ca' }],
   viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#0a0e1a',
 }
 
 export default function RootLayout({
@@ -20,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="dark">
+      <body className={`${inter.className} bg-control-bg text-control-text-primary antialiased selection:bg-control-accent/30`}>
         <Navigation />
         <main className="min-h-screen">
           {children}

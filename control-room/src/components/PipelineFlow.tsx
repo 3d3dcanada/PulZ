@@ -18,77 +18,68 @@ export default function PipelineFlow() {
 
   return (
     <div className="glass-panel-bright p-8">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-8">
         {stages.map((stage, index) => (
-          <div key={stage.name} className="flex items-center w-full md:w-auto">
+          <div key={stage.name} className="flex items-center w-full md:w-auto flex-grow">
             <motion.button
               onClick={() => setActiveStage(activeStage === index ? null : index)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative group w-full md:w-auto"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="relative group w-full md:w-auto flex-grow focus:outline-none"
             >
               <div
-                className={`glass-panel p-4 md:p-6 cursor-pointer transition-all duration-300 ${
-                  activeStage === index ? 'border-2' : 'border'
+                className={`glass-panel p-4 cursor-pointer transition-all duration-300 border-white/5 ${
+                  activeStage === index ? 'bg-white/10 ring-1 ring-white/20' : 'hover:bg-white/5'
                 }`}
-                style={{
-                  borderColor: activeStage === index ? stage.color : 'rgba(255,255,255,0.1)',
-                }}
               >
-                <div className="text-center">
+                <div className="text-center relative z-10">
                   <div
-                    className="text-lg md:text-xl font-bold mb-1"
+                    className="text-sm font-bold mb-1 tracking-tight"
                     style={{ color: stage.color }}
                   >
                     {stage.name}
                   </div>
-                  <div className="text-xs text-control-text-muted">
+                  <div className="text-[9px] font-bold text-control-text-muted uppercase tracking-widest">
                     {stage.shortDesc}
                   </div>
                 </div>
-                {activeStage === index && (
-                  <motion.div
-                    layoutId="activeStageGlow"
-                    className="absolute inset-0 rounded-lg blur-xl opacity-50"
-                    style={{ backgroundColor: stage.color }}
-                    initial={false}
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
               </div>
             </motion.button>
             
             {index < stages.length - 1 && (
               <motion.div
-                className="hidden md:block w-8 h-0.5 bg-gradient-to-r from-control-border to-control-accent/50 mx-2"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="hidden md:block w-4 h-px bg-white/10 mx-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.1 }}
               />
             )}
           </div>
         ))}
       </div>
 
-      {activeStage !== null && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className="glass-panel p-6 bg-control-bg/60"
-        >
-          <h3
-            className="text-xl font-bold mb-3"
-            style={{ color: stages[activeStage].color }}
+      <AnimatePresence>
+        {activeStage !== null && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="glass-panel p-6 bg-black/40 border-white/5 border-t-2"
+            style={{ borderTopColor: stages[activeStage].color }}
           >
-            {stages[activeStage].name} Stage
-          </h3>
-          <p className="text-control-text-secondary">
-            {getStageDescription(stages[activeStage].name)}
-          </p>
-        </motion.div>
-      )}
+            <h3
+              className="text-lg font-bold mb-3 tracking-tight"
+              style={{ color: stages[activeStage].color }}
+            >
+              {stages[activeStage].name} Stage
+            </h3>
+            <p className="text-sm text-control-text-secondary leading-relaxed">
+              {getStageDescription(stages[activeStage].name)}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

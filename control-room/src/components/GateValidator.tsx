@@ -104,37 +104,27 @@ export default function GateValidator() {
             className="relative"
           >
             <div
-              className={`glass-panel p-6 text-center transition-all duration-300 ${
+              className={`glass-panel p-6 text-center transition-all duration-500 ${
                 gate.status === 'processing'
-                  ? 'border-2'
+                  ? 'border-control-accent ring-1 ring-control-accent/20'
                   : gate.status === 'pass'
-                  ? 'border-2 border-control-success'
+                  ? 'border-control-success ring-1 ring-control-success/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
                   : gate.status === 'fail'
-                  ? 'border-2 border-control-error'
-                  : 'border'
+                  ? 'border-control-error ring-1 ring-control-error/20 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                  : 'border-white/5 opacity-50 grayscale hover:opacity-100 hover:grayscale-0'
               }`}
-              style={{
-                borderColor:
-                  gate.status === 'processing'
-                    ? gate.color
-                    : gate.status === 'pass'
-                    ? undefined
-                    : gate.status === 'fail'
-                    ? undefined
-                    : 'rgba(255,255,255,0.1)',
-              }}
             >
               <div
-                className="w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center"
+                className="w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center border border-white/5 shadow-inner"
                 style={{
                   backgroundColor:
                     gate.status === 'pending'
-                      ? 'rgba(255,255,255,0.05)'
+                      ? 'rgba(255,255,255,0.03)'
                       : gate.status === 'processing'
-                      ? `${gate.color}20`
+                      ? `${gate.color}15`
                       : gate.status === 'pass'
-                      ? '#10b98120'
-                      : '#ef444420',
+                      ? '#10b98115'
+                      : '#ef444415',
                 }}
               >
                 <AnimatePresence mode="wait">
@@ -185,14 +175,16 @@ export default function GateValidator() {
                 </AnimatePresence>
               </div>
               <div
-                className="text-lg font-bold mb-1"
+                className="text-lg font-bold mb-1 tracking-tight"
                 style={{
                   color:
                     gate.status === 'pass'
                       ? '#10b981'
                       : gate.status === 'fail'
                       ? '#ef4444'
-                      : gate.color,
+                      : gate.status === 'processing'
+                      ? gate.color
+                      : 'rgba(255,255,255,0.4)',
                 }}
               >
                 Gate {gate.id}

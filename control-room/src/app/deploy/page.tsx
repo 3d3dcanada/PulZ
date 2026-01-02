@@ -1,62 +1,65 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import SystemMap from '@/components/SystemMap'
 
 const deploymentPaths = [
   {
     title: 'Cloud Hosting',
     icon: '☁️',
     options: [
-      'NVIDIA NIM for Nemotron models',
+      'NVIDIA NIM for Nemotron',
       'Anthropic API for Claude',
       'OpenAI API for GPT',
-      'Google Vertex AI for Gemini',
+      'Google Vertex for Gemini',
       'Groq for fast inference',
     ],
-    pros: 'Managed infrastructure, auto-scaling, minimal ops overhead',
-    cons: 'Ongoing API costs, vendor dependency',
+    pros: 'Managed scale, minimal ops',
+    cons: 'API costs, vendor dependency',
   },
   {
     title: 'Local Inference',
     icon: '🖥️',
     options: [
-      'Run Nemotron locally (requires GPU)',
-      'Llama models via Ollama',
-      'Open-source model alternatives',
-      'Full data control',
+      'Nemotron via local GPU',
+      'Llama via Ollama',
+      'Open-source alternatives',
+      'Full data sovereignty',
     ],
-    pros: 'One-time hardware cost, full privacy, no rate limits',
-    cons: 'GPU requirements, model updates manual, ops complexity',
+    pros: 'One-time cost, 100% privacy',
+    cons: 'Hardware reqs, manual ops',
   },
   {
-    title: 'Hybrid Approach',
+    title: 'Hybrid / Mesh',
     icon: '🔀',
     options: [
-      'Local models for classification/routing',
-      'Cloud models for complex reasoning',
-      'Fallback between providers',
+      'Local for routing/classifying',
+      'Cloud for complex reasoning',
+      'Multi-provider fallback',
       'Cost-optimized routing',
     ],
-    pros: 'Best of both worlds, cost control, resilience',
-    cons: 'More complex architecture, requires orchestration',
+    pros: 'Resilient, cost-controlled',
+    cons: 'Higher orchestration complexity',
   },
 ]
 
 const deploymentChecklist = [
   { item: 'Model API keys configured', critical: true },
-  { item: 'Database setup (PostgreSQL recommended)', critical: true },
+  { item: 'Database setup (PostgreSQL)', critical: true },
   { item: 'Memory store initialized', critical: true },
-  { item: 'Ingestion connectors configured (email, forms)', critical: false },
+  { item: 'Ingestion connectors configured', critical: false },
   { item: 'Circuit breaker limits set', critical: true },
   { item: 'Audit log storage provisioned', critical: true },
   { item: 'User authentication enabled', critical: true },
-  { item: 'Morning brief schedule configured', critical: false },
+  { item: 'Morning brief schedule set', critical: false },
 ]
 
 export default function DeployPage() {
   return (
     <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
+        <SystemMap />
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -77,7 +80,7 @@ export default function DeployPage() {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="mb-16"
         >
-          <h2 className="text-2xl font-bold mb-8 text-control-accent">
+          <h2 className="text-2xl font-bold mb-8 text-control-accent text-center">
             Deployment Paths
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -89,41 +92,33 @@ export default function DeployPage() {
                 transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
                 className="glass-panel-bright p-6 flex flex-col"
               >
-                <div className="text-4xl mb-4 text-center">{path.icon}</div>
-                <h3 className="text-xl font-bold mb-4 text-control-text-primary text-center">
+                <div className="text-3xl mb-4 text-center">{path.icon}</div>
+                <h3 className="text-lg font-bold mb-6 text-control-text-primary text-center">
                   {path.title}
                 </h3>
                 
-                <div className="mb-4 flex-grow">
-                  <h4 className="text-sm font-semibold text-control-accent mb-2">
-                    OPTIONS
+                <div className="mb-6 flex-grow">
+                  <h4 className="text-[10px] font-bold text-control-accent mb-3 uppercase tracking-widest opacity-70 text-center">
+                    Infrastructure Options
                   </h4>
                   <ul className="space-y-2">
                     {path.options.map((option, idx) => (
-                      <li key={idx} className="flex items-start text-sm">
-                        <span className="text-control-accent mr-2">→</span>
-                        <span className="text-control-text-muted">{option}</span>
+                      <li key={idx} className="flex items-center text-xs">
+                        <span className="text-control-accent mr-2 opacity-50">→</span>
+                        <span className="text-control-text-secondary">{option}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="glass-panel p-3 bg-control-success/10">
-                    <div className="text-xs font-semibold text-control-success mb-1">
-                      PROS
-                    </div>
-                    <div className="text-xs text-control-text-muted">
-                      {path.pros}
-                    </div>
+                <div className="space-y-2">
+                  <div className="glass-panel p-3 bg-control-success/5 border-control-success/10 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-control-success uppercase tracking-widest opacity-80">Pros</span>
+                    <span className="text-[10px] text-control-text-muted text-right max-w-[120px] leading-tight">{path.pros}</span>
                   </div>
-                  <div className="glass-panel p-3 bg-control-error/10">
-                    <div className="text-xs font-semibold text-control-error mb-1">
-                      CONS
-                    </div>
-                    <div className="text-xs text-control-text-muted">
-                      {path.cons}
-                    </div>
+                  <div className="glass-panel p-3 bg-control-error/5 border-control-error/10 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-control-error uppercase tracking-widest opacity-80">Cons</span>
+                    <span className="text-[10px] text-control-text-muted text-right max-w-[120px] leading-tight">{path.cons}</span>
                   </div>
                 </div>
               </motion.div>
@@ -142,27 +137,27 @@ export default function DeployPage() {
             Pre-Deployment Checklist
           </h2>
           <div className="glass-panel-bright p-8">
-            <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
               {deploymentChecklist.map((item, index) => (
                 <motion.div
                   key={item.item}
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 0, x: -10 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
-                  className="flex items-center justify-between glass-panel p-4"
+                  className="flex items-center justify-between glass-panel p-4 bg-black/20 border-white/5"
                 >
-                  <div className="flex items-center flex-grow">
-                    <div className="w-6 h-6 rounded border-2 border-control-accent mr-4 flex items-center justify-center flex-shrink-0">
-                      <span className="text-control-accent text-xs">□</span>
+                  <div className="flex items-center">
+                    <div className="w-5 h-5 rounded border border-control-accent/50 mr-3 flex items-center justify-center flex-shrink-0">
+                      <span className="text-control-accent text-[10px]">✓</span>
                     </div>
-                    <span className="text-control-text-secondary">
+                    <span className="text-sm text-control-text-secondary font-medium">
                       {item.item}
                     </span>
                   </div>
                   {item.critical && (
-                    <span className="px-3 py-1 bg-control-error/20 text-control-error text-xs font-semibold rounded ml-4">
-                      CRITICAL
+                    <span className="px-2 py-0.5 bg-control-error/10 text-control-error text-[10px] font-bold rounded uppercase tracking-tighter">
+                      Critical
                     </span>
                   )}
                 </motion.div>
@@ -181,76 +176,44 @@ export default function DeployPage() {
           <h2 className="text-2xl font-bold mb-8 text-control-accent">
             Phased Rollout
           </h2>
-          <div className="space-y-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
-                phase: 'Phase 1: Foundation',
-                items: [
-                  'Kernel + memory system',
-                  'Validation engine',
-                  'Single model (Claude)',
-                  'Manual brief generation',
-                ],
+                phase: 'P1: Foundation',
+                items: ['Kernel & memory', 'Validation engine', 'Claude (Primary)', 'Manual briefs'],
               },
               {
-                phase: 'Phase 2: Safety',
-                items: [
-                  'Four-gate validation active',
-                  'Circuit breakers enabled',
-                  'Confidence scoring',
-                  'Audit logging',
-                ],
+                phase: 'P2: Safety',
+                items: ['4-Gate active', 'Circuit breakers', 'Scoring engine', 'Audit logging'],
               },
               {
-                phase: 'Phase 3: Consensus',
-                items: [
-                  'Add GPT-4 critique',
-                  'Add Gemini consensus',
-                  'Agreement mapping',
-                  'Conflict resolution UI',
-                ],
+                phase: 'P3: Consensus',
+                items: ['GPT-4 Critique', 'Gemini Consensus', 'Agreement maps', 'Conflict UI'],
               },
               {
-                phase: 'Phase 4: Business Lanes',
-                items: [
-                  'Email connector',
-                  'Quote form integration',
-                  'Tender feed ingestion',
-                  'Morning brief automation',
-                ],
+                phase: 'P4: Lanes',
+                items: ['Connectors active', 'Lane workflows', 'Feed ingestion', 'Full automation'],
               },
             ].map((phase, index) => (
               <motion.div
                 key={phase.phase}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="glass-panel-bright p-6"
+                className="glass-panel-bright p-6 border-t-2 border-t-control-accent"
               >
-                <div className="flex items-start">
-                  <div className="w-12 h-12 rounded-lg bg-control-accent/20 flex items-center justify-center mr-4 flex-shrink-0">
-                    <span className="text-control-accent font-bold text-xl">
-                      {index + 1}
-                    </span>
-                  </div>
-                  <div className="flex-grow">
-                    <h3 className="text-lg font-bold mb-3 text-control-text-primary">
-                      {phase.phase}
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-2">
-                      {phase.items.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center text-sm text-control-text-muted"
-                        >
-                          <span className="text-control-accent mr-2">✓</span>
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                <div className="text-[10px] font-bold text-control-accent uppercase tracking-[0.2em] mb-3">
+                  {phase.phase}
                 </div>
+                <ul className="space-y-2">
+                  {phase.items.map((item, idx) => (
+                    <li key={idx} className="text-xs text-control-text-muted flex items-start">
+                      <span className="text-control-accent mr-2 opacity-50">→</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
             ))}
           </div>
@@ -261,31 +224,33 @@ export default function DeployPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="glass-panel-bright p-8 text-center"
+          className="glass-panel-bright p-12 text-center relative overflow-hidden"
         >
-          <h2 className="text-2xl font-bold mb-4 text-control-accent">
-            Ready to Build?
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-control-accent to-transparent" />
+          <h2 className="text-3xl font-bold mb-6 text-gradient">
+            Build with PulZ
           </h2>
-          <p className="text-control-text-secondary mb-6 max-w-2xl mx-auto">
-            PulZ is a specification, not yet executable code. This control room
-            demonstrates the governance model, validation gates, and operational philosophy.
+          <p className="text-control-text-secondary mb-10 max-w-2xl mx-auto text-sm leading-relaxed">
+            PulZ is an open specification for trustworthy AI orchestration. 
+            This control room artifact demonstrates the model that ensures safety, 
+            consensus, and human authority in every operation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="https://github.com/3D3D/PulZ"
               target="_blank"
               rel="noopener noreferrer"
-              className="control-button"
+              className="control-button px-8"
             >
-              View on GitHub
+              Source Repo
             </a>
             <a
               href="https://3d3d.ca"
               target="_blank"
               rel="noopener noreferrer"
-              className="control-button border-control-accent/50"
+              className="control-button px-8 border-control-accent/30"
             >
-              Learn About 3D3D
+              About 3D3D
             </a>
           </div>
         </motion.section>

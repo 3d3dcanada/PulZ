@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import SystemMap from '@/components/SystemMap'
 
 const truthModel = [
   {
@@ -52,6 +53,8 @@ export default function PhilosophyPage() {
   return (
     <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        <SystemMap />
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -80,24 +83,27 @@ export default function PhilosophyPage() {
             Everything else is labeled as UNVERIFIED.
           </p>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {truthModel.map((item, index) => (
               <motion.div
                 key={item.type}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
                 className="glass-panel-bright p-6"
               >
-                <h3 className="text-lg font-bold mb-2 text-control-text-primary">
-                  {index + 1}. {item.type}
-                </h3>
-                <p className="text-control-text-secondary mb-3">
+                <div className="flex items-center mb-2">
+                   <span className="text-xs font-mono text-control-accent mr-3">0{index + 1}</span>
+                   <h3 className="text-lg font-bold text-control-text-primary">
+                    {item.type}
+                  </h3>
+                </div>
+                <p className="text-control-text-secondary mb-4 text-sm">
                   {item.description}
                 </p>
-                <div className="glass-panel p-3 bg-control-bg/40">
-                  <span className="text-sm text-control-text-muted font-mono">
-                    Example: {item.example}
+                <div className="glass-panel p-3 bg-black/20">
+                  <span className="text-xs text-control-text-muted font-mono">
+                    PROVENANCE: {item.example}
                   </span>
                 </div>
               </motion.div>
@@ -112,59 +118,26 @@ export default function PhilosophyPage() {
           transition={{ duration: 0.6 }}
           className="mb-16"
         >
-          <h2 className="text-2xl font-bold mb-6 text-control-accent">
+          <h2 className="text-2xl font-bold mb-6 text-control-accent text-center">
             The No Hallucination Contract
           </h2>
           <div className="glass-panel-bright p-8">
-            <p className="text-control-text-secondary mb-6 leading-relaxed">
-              PulZ enforces a strict protocol for every output:
-            </p>
-            <ol className="space-y-4">
-              <li className="flex items-start">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-control-accent/20 text-control-accent font-bold mr-4 flex-shrink-0">
-                  1
-                </span>
-                <div>
-                  <span className="font-semibold text-control-text-primary">Extract claims</span>
-                  <p className="text-control-text-muted text-sm mt-1">
-                    Identify every factual assertion
-                  </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { step: 'Extract', desc: 'Identify every factual assertion' },
+                { step: 'Validate', desc: 'Check against truth model' },
+                { step: 'Score', desc: '0-100 confidence based on proof' },
+                { step: 'Halt', desc: 'If unverified, do not proceed' },
+              ].map((item, idx) => (
+                <div key={idx} className="text-center p-4 glass-panel bg-white/5">
+                  <div className="w-10 h-10 rounded-full bg-control-accent/20 flex items-center justify-center mx-auto mb-3 text-control-accent font-bold">
+                    {idx + 1}
+                  </div>
+                  <div className="font-bold text-sm mb-1">{item.step}</div>
+                  <div className="text-[10px] text-control-text-muted uppercase tracking-tighter">{item.desc}</div>
                 </div>
-              </li>
-              <li className="flex items-start">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-control-accent/20 text-control-accent font-bold mr-4 flex-shrink-0">
-                  2
-                </span>
-                <div>
-                  <span className="font-semibold text-control-text-primary">Validate claims</span>
-                  <p className="text-control-text-muted text-sm mt-1">
-                    Check against truth model criteria
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-control-accent/20 text-control-accent font-bold mr-4 flex-shrink-0">
-                  3
-                </span>
-                <div>
-                  <span className="font-semibold text-control-text-primary">Assign confidence</span>
-                  <p className="text-control-text-muted text-sm mt-1">
-                    0-100 score based on evidence quality
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-control-accent/20 text-control-accent font-bold mr-4 flex-shrink-0">
-                  4
-                </span>
-                <div>
-                  <span className="font-semibold text-control-text-primary">Refuse or escalate</span>
-                  <p className="text-control-text-muted text-sm mt-1">
-                    If confidence is below threshold, don&apos;t proceed
-                  </p>
-                </div>
-              </li>
-            </ol>
+              ))}
+            </div>
           </div>
         </motion.section>
 
@@ -181,7 +154,7 @@ export default function PhilosophyPage() {
             {operationalRules.map((item, index) => (
               <motion.div
                 key={item.rule}
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.98 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
@@ -190,14 +163,16 @@ export default function PhilosophyPage() {
                 <h3 className="text-lg font-bold mb-2 text-control-text-primary">
                   {item.rule}
                 </h3>
-                <p className="text-control-text-secondary text-sm mb-3">
-                  <span className="text-control-accent font-semibold">Why: </span>
-                  {item.why}
-                </p>
-                <p className="text-control-text-muted text-sm">
-                  <span className="text-gate-consistency font-semibold">How: </span>
-                  {item.how}
-                </p>
+                <div className="space-y-2">
+                  <p className="text-control-text-secondary text-xs">
+                    <span className="text-control-accent font-bold uppercase tracking-widest text-[10px] mr-2">Why</span>
+                    {item.why}
+                  </p>
+                  <p className="text-control-text-secondary text-xs">
+                    <span className="text-gate-consistency font-bold uppercase tracking-widest text-[10px] mr-2">How</span>
+                    {item.how}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>
