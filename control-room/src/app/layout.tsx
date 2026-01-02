@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Navigation from '@/components/Navigation'
+import OperatorBoundary from '@/components/OperatorBoundary'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,10 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-control-bg text-control-text-primary antialiased selection:bg-control-accent/30`}>
-        <Navigation />
-        <main className="min-h-screen">
-          {children}
-        </main>
+        <OperatorBoundary>
+          <Navigation />
+          <main className="min-h-screen">
+            {children}
+          </main>
+        </OperatorBoundary>
       </body>
     </html>
   )
