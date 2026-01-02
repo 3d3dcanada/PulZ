@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-control-border;
+  }
+  
+  body {
+    @apply bg-control-bg text-control-text-primary antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-control-surface/40 backdrop-blur-md border border-control-border/50 rounded-lg;
+  }
+
+  .glass-panel-bright {
+    @apply bg-control-surface/60 backdrop-blur-lg border border-control-border shadow-glass;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-control-accent to-gate-consensus bg-clip-text text-transparent;
+  }
+
+  .glow {
+    text-shadow: 0 0 20px currentColor;
+  }
+
+  .control-button {
+    @apply glass-panel px-6 py-3 hover:bg-control-surface/60 transition-all duration-200 
+           border-control-border/70 hover:border-control-accent/50 cursor-pointer;
+  }
+}
