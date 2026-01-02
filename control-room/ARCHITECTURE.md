@@ -682,6 +682,66 @@ function helperFunction() {
 4. Review and merge to main
 5. Deploy automatically via GitHub Actions
 
+## Deployment Incident: Pages Served 404 / Wrong Artifact
+
+### Symptom Observed
+GitHub Pages displayed a 404 error or served incorrect content despite the workflow reporting successful deployment. The custom domain `ktk3d.com` was not rendering the Control Room site.
+
+### Root Cause
+**Configuration mismatch between deployment mode and base path:**
+
+1. Repository contains a `CNAME` file pointing to `ktk3d.com`, enabling custom domain deployment
+2. GitHub Actions workflow hardcodes `NEXT_PUBLIC_BASE_PATH: /PulZ`, which is appropriate for repository path deployment (`username.github.io/PulZ/`) but incorrect for custom domain deployment
+3. With `/PulZ` base path, all assets receive the prefix `/PulZ/` while GitHub Pages serves from the domain root (`/`)
+4. This mismatch causes:
+   - All asset references to break (404 on JS/CSS files)
+   - Router navigation to fail
+   - Links to be incorrect
+
+### Invariant Violated
+**Build configuration must align with deployment mode.** When `CNAME` exists (custom domain), base path must be empty. When no `CNAME` (repo path), base path must be set to repository name.
+
+### Fix Applied
+1. Updated workflow to detect deployment mode from `CNAME` presence
+2. Set `NEXT_PUBLIC_BASE_PATH` conditionally:
+   - Empty string when `CNAME` exists (custom domain)
+   - `/PulZ` when no `CNAME` (repository path)
+3. Added build assertion step to verify `index.html` and `404.html` exist in export
+
+### Prevention Going Forward
+1. **Invariant Gate**: Workflow validates that `CNAME` presence matches base path configuration
+2. **Artifact Verification**: Build fails if required files (`index.html`, `404.html`) are missing
+3. **Explicit Mode Detection**: Deployment mode is derived from file presence, not assumed
+
+## Two-Strike Verification Protocol
+
+### Purpose
+When deploy claims success but actual behavior differs, PulZ must double-check before declaring victory. This protocol encodes systematic skepticism into the deployment process.
+
+### Protocol Rules
+
+**Strike 1: Log and Identify**
+- Log incident details to learning library
+- Identify probable cause candidates
+- Do not close until root cause is confirmed
+
+**Strike 2: Root Cause + Prevention Gate**
+- Explicit root cause must be identified
+- Prevention gate must be implemented
+- Only close incident after verification
+
+### Implementation
+- `kernel/learning/verificationChecklist.ts`: Checklist of deployment verification steps
+- `kernel/learning/incidentLog.ts`: Append-only incident logging abstraction
+- `/learning` page: Visible integrity dashboard showing incidents and verification status
+
+### Verification Checklist
+1. **Artifact Existence**: `index.html` exists at export root
+2. **Fallback Existence**: `404.html` exists (or equivalent static fallback)
+3. **Base Path Correctness**: Base path matches deployment mode (custom domain vs repo path)
+4. **Asset Loading**: Critical CSS/JS bundles are referenced correctly
+5. **Route Resolution**: Internal routes resolve without 404s
+
 ## References
 
 - [Next.js Docs](https://nextjs.org/docs)
