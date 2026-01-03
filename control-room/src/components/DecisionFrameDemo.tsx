@@ -17,11 +17,22 @@ import {
   type EvidenceReport,
   type DecisionFrame,
 } from '../../kernel'
+import Tooltip from './literacy/Tooltip'
+import ExplainPanel, { ExplainerType } from './literacy/ExplainPanel'
+import { Info } from 'lucide-react'
+import { WidgetCard, DemoTimeline, ConfidenceDistribution } from './literacy/VisualWidgets'
 
 export default function DecisionFrameDemo() {
   const [evidenceReport, setEvidenceReport] = useState<EvidenceReport | null>(null)
   const [decisionFrame, setDecisionFrame] = useState<DecisionFrame | null>(null)
   const [step, setStep] = useState<'evidence' | 'decision' | 'review' | 'complete'>('evidence')
+  const [explainType, setExplainType] = useState<ExplainerType | null>(null)
+  const [explainData, setExplainData] = useState<any>(null)
+
+  const openExplainer = (type: ExplainerType, data?: any) => {
+    setExplainType(type)
+    setExplainData(data)
+  }
 
   useEffect(() => {
     createInitialEvidence()
@@ -212,12 +223,33 @@ export default function DecisionFrameDemo() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <WidgetCard title="Tender Intake" subtitle="Signals over time">
+                <DemoTimeline />
+              </WidgetCard>
+              <WidgetCard title="Source Verification" subtitle="Distribution">
+                <div className="h-24 flex items-center">
+                  <ConfidenceDistribution />
+                </div>
+              </WidgetCard>
+            </div>
+
             <div className="glass-panel p-6 bg-black/20">
-              <h4 className="font-semibold mb-4 text-control-accent">Evidence Report</h4>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-semibold text-control-accent">Evidence Report</h4>
+                <button
+                  onClick={() => openExplainer('EvidenceReport', evidenceReport)}
+                  className="p-1 hover:bg-control-accent/10 rounded transition-colors text-control-text-secondary hover:text-control-accent"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+              </div>
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-control-text-muted">ID:</span>{' '}
-                  <span className="font-mono text-control-text-primary">{evidenceReport.id}</span>
+                  <Tooltip content="Unique identifier for this specific evidence collection.">
+                    <span className="font-mono text-control-text-primary">{evidenceReport.id}</span>
+                  </Tooltip>
                 </div>
                 <div>
                   <span className="text-control-text-muted">Items:</span>{' '}
@@ -225,7 +257,9 @@ export default function DecisionFrameDemo() {
                 </div>
                 <div>
                   <span className="text-control-text-muted">Confidence Score:</span>{' '}
-                  <span className="text-control-success font-bold">{evidenceReport.confidence_score}/100</span>
+                  <Tooltip content="Weighted aggregate of all evidence reliability. Score > 90 is required for automation.">
+                    <span className="text-control-success font-bold">{evidenceReport.confidence_score}/100</span>
+                  </Tooltip>
                 </div>
                 <div>
                   <span className="text-control-text-muted">Coverage:</span>{' '}
@@ -234,9 +268,15 @@ export default function DecisionFrameDemo() {
               </div>
 
               <div className="mt-4 pt-4 border-t border-control-border">
-                <div className="text-xs text-control-text-muted mb-2">Evidence Items:</div>
+                <div className="text-xs text-control-text-muted mb-2 uppercase tracking-widest">Evidence Items:</div>
                 {evidenceReport.items.map((item) => (
-                  <div key={item.id} className="mb-2 p-2 glass-panel text-xs">
+                  <div key={item.id} className="mb-2 p-2 glass-panel text-xs relative group">
+                    <button
+                      onClick={() => openExplainer('EvidenceItem', item)}
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-control-accent/10 rounded text-control-text-secondary"
+                    >
+                      <Info className="w-3 h-3" />
+                    </button>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-control-accent font-semibold">{item.type}</span>
                       <span className={item.verified ? 'text-control-success' : 'text-control-warning'}>
@@ -270,7 +310,15 @@ export default function DecisionFrameDemo() {
             className="space-y-4"
           >
             <div className="glass-panel p-6 bg-black/20">
-              <h4 className="font-semibold mb-4 text-control-accent">Decision Frame</h4>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-semibold text-control-accent">Decision Frame</h4>
+                <button
+                  onClick={() => openExplainer('DecisionFrame', decisionFrame)}
+                  className="p-1 hover:bg-control-accent/10 rounded transition-colors text-control-text-secondary hover:text-control-accent"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+              </div>
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-control-text-muted">Objective:</span>
@@ -282,30 +330,34 @@ export default function DecisionFrameDemo() {
                 </div>
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-control-border">
                   <div>
-                    <span className="text-control-text-muted text-xs">Confidence:</span>
-                    <div className="text-control-success font-bold">{decisionFrame.confidence_score}/100</div>
+                    <span className="text-control-text-muted text-xs uppercase tracking-widest">Confidence:</span>
+                    <Tooltip content="Inherited from the evidence report. Score must be > 90 to bypass human review.">
+                      <div className="text-control-success font-bold">{decisionFrame.confidence_score}/100</div>
+                    </Tooltip>
                   </div>
                   <div>
-                    <span className="text-control-text-muted text-xs">Risk Level:</span>
-                    <div className={`font-bold ${
-                      decisionFrame.risk_level === 'low' ? 'text-control-success' :
-                      decisionFrame.risk_level === 'medium' ? 'text-control-warning' :
-                      'text-control-error'
-                    }`}>
-                      {decisionFrame.risk_level.toUpperCase()}
-                    </div>
+                    <span className="text-control-text-muted text-xs uppercase tracking-widest">Risk Level:</span>
+                    <Tooltip content="Categorization of the potential impact of this decision on the overall system.">
+                      <div className={`font-bold ${
+                        decisionFrame.risk_level === 'low' ? 'text-control-success' :
+                        decisionFrame.risk_level === 'medium' ? 'text-control-warning' :
+                        'text-control-error'
+                      }`}>
+                        {decisionFrame.risk_level.toUpperCase()}
+                      </div>
+                    </Tooltip>
                   </div>
                 </div>
                 <div>
-                  <span className="text-control-text-muted text-xs">Status:</span>
+                  <span className="text-control-text-muted text-xs uppercase tracking-widest">Status:</span>
                   <div className="font-mono text-control-text-primary">{decisionFrame.status}</div>
                 </div>
               </div>
 
               <div className="mt-4 pt-4 border-t border-control-border">
-                <div className="text-xs text-control-text-muted mb-2">Confidence Policy Evaluation:</div>
+                <div className="text-xs text-control-text-muted mb-2 uppercase tracking-widest">Confidence Policy Evaluation:</div>
                 <div className="p-3 glass-panel text-xs space-y-2">
-                  <div className="text-control-text-secondary">{policy.reasoning}</div>
+                  <div className="text-control-text-secondary leading-relaxed">{policy.reasoning}</div>
                   <div className="flex items-center space-x-4 mt-2">
                     <span className={policy.requires_approval ? 'text-control-warning' : 'text-control-success'}>
                       {policy.requires_approval ? '⚠ Approval Required' : '✓ No Approval Needed'}
@@ -418,6 +470,13 @@ export default function DecisionFrameDemo() {
           </motion.div>
         )}
       </div>
+
+      <ExplainPanel 
+        isOpen={!!explainType} 
+        onClose={() => setExplainType(null)} 
+        type={explainType || 'EvidenceItem'} 
+        data={explainData}
+      />
     </div>
   )
 }

@@ -15,6 +15,7 @@ const navItems = [
   { href: '/consensus', label: 'Consensus' },
   { href: '/lanes', label: 'Lanes' },
   { href: '/learning', label: 'Learning' },
+  { href: '/library', label: 'Library' },
   { href: '/settings', label: 'Settings' },
 ]
 

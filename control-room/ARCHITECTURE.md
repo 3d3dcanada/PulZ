@@ -713,6 +713,45 @@ GitHub Pages displayed a 404 error or served incorrect content despite the workf
 2. **Artifact Verification**: Build fails if required files (`index.html`, `404.html`) are missing
 3. **Explicit Mode Detection**: Deployment mode is derived from file presence, not assumed
 
+## Operator Literacy Layer (v2.3)
+
+The Operator Literacy Layer (OLL) is a set of UI patterns and components designed to bridge the gap between technical system objects and non-technical operator understanding. It ensures that any "mechanic-level" engineer can operate PulZ without deep knowledge of the code paths.
+
+### Core Components
+
+#### 1. Universal Tooltip System
+Provides in-place definitions for technical identifiers, hashes, and governance concepts.
+- **Trigger**: Hover or focus on IDs, config keys, or status labels.
+- **Content**: Plain-language explanation of the field's purpose and impact.
+- **Accessibility**: Keyboard accessible (Tab + Enter) and respects reduced motion.
+
+#### 2. "Explain This" Panel Pattern
+A reusable side-drawer component that translates complex system objects into human-readable narratives.
+- **What it is**: Simple definition.
+- **Why it exists**: Context and purpose.
+- **What it affects**: Downstream consequences.
+- **Governance Context**: Plain-language interpretation of confidence scores and risk levels.
+- **Supported Objects**: EvidenceItem, EvidenceReport, DecisionFrame, AuditEvent, EndpointSlot.
+
+#### 3. Visual Console Widgets
+Calm, dashboard-like visualizations using demo data to provide high-level system awareness.
+- **Tender Intake (Demo)**: Timeline of incoming opportunities.
+- **Machine Utilization (Demo)**: Status of connected hardware units.
+- **Confidence Distribution (Demo)**: Snapshot of decision reliability across the system.
+- **Audit Intensity**: Visual frequency of system events.
+- **Integrity**: Always labeled as "Demo signals, not live telemetry" to maintain system honesty.
+
+#### 4. System Library Shell
+A dedicated knowledge base accessible via `/library` that houses the "middle-layer" documentation.
+- **Structure**: Modular sections for Governance, Learning, Tenders, Manufacturing, and Robotics.
+- **Purpose**: Provides a space for long-form context and tool registries without cluttering the high-stakes Control Room UI.
+
+### Anti-Indexing Posture
+To reduce casual indexing of demo/deployment environments while maintaining public accessibility:
+- **robots.txt**: Standard "Disallow: /" instruction.
+- **Meta Tags**: `noindex, nofollow` on all pages.
+- **Honesty Note**: Explicitly documented as a reduction of casual indexing, not a security feature against hostile bots.
+
 ## Two-Strike Verification Protocol
 
 ### Purpose

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import SystemMap from '@/components/SystemMap'
 import DecisionFrameDemo from '@/components/DecisionFrameDemo'
 import AuditViewer from '@/components/AuditViewer'
+import Tooltip from '@/components/literacy/Tooltip'
 
 export default function GovernancePage() {
   return (
@@ -42,8 +43,14 @@ export default function GovernancePage() {
               </h3>
               <p className="text-sm text-control-text-secondary leading-relaxed">
                 The &ldquo;executed&rdquo; state requires an explicit approval artifact. A decision cannot 
-                transition to approved status without both <code className="text-control-accent">approver_id</code> and{' '}
-                <code className="text-control-accent">approval_timestamp</code>. The kernel validator rejects 
+                transition to approved status without both{' '}
+                <Tooltip content="The identity of the human operator who authorized this action.">
+                  <code className="text-control-accent cursor-help">approver_id</code>
+                </Tooltip>{' '}
+                and{' '}
+                <Tooltip content="The precise moment (ISO 8601) when approval was granted.">
+                  <code className="text-control-accent cursor-help">approval_timestamp</code>
+                </Tooltip>. The kernel validator rejects 
                 any attempt to bypass this.
               </p>
             </div>
@@ -53,7 +60,10 @@ export default function GovernancePage() {
                 Evidence Gating
               </h3>
               <p className="text-sm text-control-text-secondary leading-relaxed">
-                Every recommendation must reference an <code className="text-control-accent">EvidenceReport</code>. 
+                Every recommendation must reference an{' '}
+                <Tooltip content="An immutable document aggregating all verified facts supporting a proposed action.">
+                  <code className="text-control-accent cursor-help">EvidenceReport</code>
+                </Tooltip>. 
                 Claims without evidence must be explicitly labeled as Configurable Assumptions. The system cannot 
                 recommend actions based on unverified assertions.
               </p>
@@ -75,7 +85,11 @@ export default function GovernancePage() {
                 Append-Only Audit
               </h3>
               <p className="text-sm text-control-text-secondary leading-relaxed">
-                Every state change produces an <code className="text-control-accent">AuditEvent</code> with 
+                Every state change produces an{' '}
+                <Tooltip content="A cryptographically-chained record of a single state transition in the system.">
+                  <code className="text-control-accent cursor-help">AuditEvent</code>
+                </Tooltip>{' '}
+                with 
                 cryptographic hashes linking to the previous event. No destructive edits. No silent modifications. 
                 The audit trail is verifiable and tamper-evident.
               </p>

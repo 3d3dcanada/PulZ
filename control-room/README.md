@@ -39,6 +39,15 @@ If you have one minute, follow this path to understand the PulZ trust model:
 3.  **[Consensus](/consensus)**: View how we handle AI disagreement. We surface conflicts rather than hiding them, ensuring you remain the ultimate authority.
 4.  **[Confidence](/confidence)**: See the scoring engine that determines what is "Auto-Safe" and what requires your signature.
 
+## 🛠️ Operator Quickstart (The Literacy Layer)
+
+PulZ is designed to be operated by engineers who understand systems, not just code. The UI provides several tools to help you interpret system behavior without hunting through documentation:
+
+- **Universal Tooltips**: Hover over any ID, hash, or score to see a plain-language explanation of what it is and why it matters.
+- **"Explain This" Panels**: Look for the small `(i)` icons. Clicking them opens a side panel that translates technical system objects (like Evidence Reports or Decision Frames) into human narratives.
+- **The Library**: Visit the **[Library](/library)** page for high-level context on governance, machine utilization, and technical protocols.
+- **Visual Signals**: Dashboard widgets provide at-a-glance awareness of system health and decision distribution. Note: These are demo signals, not live telemetry.
+
 ## 🛡️ Governance Guarantees
 
 PulZ is engineered with hard boundaries to ensure trust and durability. Governance is enforced by the **kernel layer**, not by UI language.

@@ -143,6 +143,37 @@ export function seedIncidentLog(): void {
       },
       closedAt: '2026-01-03T00:15:00Z',
     })
+
+    // Operator Literacy Gap incident
+    INCIDENT_LOG.push({
+      incident: {
+        id: 'INC-2025-003',
+        timestamp: '2025-01-03T12:00:00Z',
+        description: 'Operator unable to interpret system fields (IDs, hashes, scores)',
+        deploymentMode: 'custom_domain',
+        probableCauses: [
+          'Raw technical identifiers displayed without context',
+          'Governance concepts like "Confidence Score" lacked plain-language explanation',
+          'No in-place translation from code-level objects to operator-level meaning',
+        ],
+        status: 'resolved',
+        checks: [
+          {
+            passed: false,
+            message: 'Non-technical operator literacy gap',
+            details: 'Mechanic-level engineers could not determine if a Confidence Score of 75 was "good" or "dangerous" without documentation hunting.',
+            timestamp: '2025-01-03T12:00:00Z',
+          },
+        ],
+      },
+      resolution: {
+        rootCause: 'The UI prioritized technical precision over operational clarity, assuming operators already understood the governance kernel architecture.',
+        preventionGate: 'Implemented the Operator Literacy Layer: Universal tooltips for every field, "Explain This" panels for all system objects, and a dedicated Library shell for middle-layer knowledge. Verification: Every ID has an Explain affordance.',
+        verifiedAt: '2025-01-03T14:00:00Z',
+        verifiedBy: 'cto.new',
+      },
+      closedAt: '2025-01-03T14:00:00Z',
+    })
   }
 }
 

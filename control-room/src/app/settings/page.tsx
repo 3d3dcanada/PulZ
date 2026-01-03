@@ -2,9 +2,20 @@
 
 import { motion } from 'framer-motion'
 import { ENDPOINT_SLOTS, getEndpointStats } from '@/config/endpoints'
+import Tooltip from '@/components/literacy/Tooltip'
+import ExplainPanel from '@/components/literacy/ExplainPanel'
+import { Info } from 'lucide-react'
+import { useState } from 'react'
 
 export default function SettingsPage() {
   const stats = getEndpointStats()
+  const [isExplainOpen, setIsExplainOpen] = useState(false)
+  const [selectedEndpoint, setSelectedEndpoint] = useState<any>(null)
+
+  const openExplain = (endpoint: any) => {
+    setSelectedEndpoint(endpoint)
+    setIsExplainOpen(true)
+  }
 
   return (
     <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
@@ -97,21 +108,25 @@ export default function SettingsPage() {
                     </p>
                     <div className="grid grid-cols-2 gap-4 text-xs">
                       <div>
-                        <span className="text-control-text-muted">Auth Type:</span>{' '}
-                        <span className="font-mono text-control-text-primary">{endpoint.authType}</span>
+                        <span className="text-control-text-muted uppercase tracking-tighter">Auth Type:</span>{' '}
+                        <Tooltip content="The authentication protocol used to talk to this model provider.">
+                          <span className="font-mono text-control-text-primary">{endpoint.authType}</span>
+                        </Tooltip>
                       </div>
                       <div>
-                        <span className="text-control-text-muted">Base URL:</span>{' '}
-                        <span className="font-mono text-control-text-primary text-[10px]">{endpoint.baseUrl}</span>
+                        <span className="text-control-text-muted uppercase tracking-tighter">Base URL:</span>{' '}
+                        <Tooltip content="The entry point for this API. This is where PulZ sends its requests.">
+                          <span className="font-mono text-control-text-primary text-[10px]">{endpoint.baseUrl}</span>
+                        </Tooltip>
                       </div>
                       {endpoint.rateLimit && (
                         <>
                           <div>
-                            <span className="text-control-text-muted">Rate Limit:</span>{' '}
+                            <span className="text-control-text-muted uppercase tracking-tighter">Rate Limit:</span>{' '}
                             <span className="text-control-text-primary">{endpoint.rateLimit.requestsPerMinute}/min</span>
                           </div>
                           <div>
-                            <span className="text-control-text-muted">Burst Limit:</span>{' '}
+                            <span className="text-control-text-muted uppercase tracking-tighter">Burst Limit:</span>{' '}
                             <span className="text-control-text-primary">{endpoint.rateLimit.burstLimit}</span>
                           </div>
                         </>
@@ -119,7 +134,14 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   
-                  <div className="flex flex-col items-end gap-2">
+                  <div className="flex flex-col items-end gap-3">
+                    <button
+                      onClick={() => openExplain(endpoint)}
+                      className="p-1.5 hover:bg-control-accent/10 rounded transition-colors text-control-text-secondary hover:text-control-accent"
+                      title="Explain this endpoint"
+                    >
+                      <Info className="w-4 h-4" />
+                    </button>
                     {endpoint.requiresSecret && (
                       <div className="text-[10px] text-control-warning font-bold uppercase tracking-wider">
                         Requires Secret
@@ -140,7 +162,7 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="p-6 bg-control-warning/10 border border-control-warning/30 rounded-lg"
+          className="p-6 bg-control-warning/10 border border-control-warning/30 rounded-lg mb-12"
         >
           <div className="flex items-start gap-3">
             <span className="text-2xl">🔒</span>
@@ -157,6 +179,13 @@ export default function SettingsPage() {
           </div>
         </motion.div>
       </div>
+
+      <ExplainPanel 
+        isOpen={isExplainOpen} 
+        onClose={() => setIsExplainOpen(false)} 
+        type="EndpointSlot" 
+        data={selectedEndpoint}
+      />
     </div>
   )
 }
