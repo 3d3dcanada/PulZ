@@ -12,8 +12,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface PulzUser {
   id: string;
-  email: string;
-  name: string;
+  display_name: string;
   role: string;
 }
 
@@ -41,8 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (pulzUser && pulzUser.id) {
         setUser({
           id: pulzUser.id,
-          email: pulzUser.email || '',
-          name: pulzUser.name || 'User',
+          display_name: pulzUser.display_name || 'User',
           role: pulzUser.role || 'user',
         });
       }

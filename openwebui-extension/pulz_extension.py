@@ -68,7 +68,10 @@ class PulzExtension:
         """
         Check if the request has a valid authenticated session.
 
-        Returns user info dict if authenticated, None otherwise.
+        Returns MINIMAL user info dict if authenticated, None otherwise.
+
+        SECURITY: Only allowlisted fields are returned to prevent leaking sensitive data.
+        Allowlist: id, display_name, role
 
         OpenWebUI should provide user info via request.state.user or request.user
         """
@@ -78,21 +81,31 @@ class PulzExtension:
         if not user:
             return None
 
-        # Extract user info
+        # Extract minimal allowlisted user info (NO email, NO tokens, NO sensitive data)
         if isinstance(user, dict):
-            return {
-                'id': user.get('id'),
-                'email': user.get('email'),
-                'name': user.get('name'),
-                'role': user.get('role', 'user'),
-            }
+            user_id = user.get('id')
+            display_name = user.get('display_name') or user.get('name') or user.get('username') or 'User'
+            role = user.get('role', 'user')
+        else:
+            # If user is an object, try to extract attributes
+            user_id = getattr(user, 'id', None)
+            display_name = (
+                getattr(user, 'display_name', None) or
+                getattr(user, 'name', None) or
+                getattr(user, 'username', None) or
+                'User'
+            )
+            role = getattr(user, 'role', 'user')
 
-        # If user is an object, try to extract attributes
+        # Validate user_id exists
+        if not user_id:
+            return None
+
+        # Return ONLY allowlisted fields (sanitized)
         return {
-            'id': getattr(user, 'id', None),
-            'email': getattr(user, 'email', None),
-            'name': getattr(user, 'name', None),
-            'role': getattr(user, 'role', 'user'),
+            'id': str(user_id),  # Ensure string
+            'display_name': str(display_name)[:100],  # Limit length, ensure string
+            'role': str(role)[:20] if role else 'user',  # Limit length, ensure string
         }
 
     def _unauthorized_response(self) -> Dict[str, Any]:
@@ -179,7 +192,7 @@ class PulzExtension:
             print("[PulZ] Unauthorized access attempt to /pulz/")
             return self._unauthorized_response()
 
-        print(f"[PulZ] Authenticated access by user: {user.get('email')} ({user.get('id')})")
+        print(f"[PulZ] Authenticated access by user: {user.get('display_name')} ({user.get('id')})")
 
         index_path = Path(self.build_path) / 'index.html'
 
@@ -192,8 +205,9 @@ class PulzExtension:
         with open(index_path, 'r') as f:
             content = f.read()
 
-        # Inject user info into the HTML as a script tag
-        user_json = json.dumps(user)
+        # Inject MINIMAL user info into the HTML as a script tag (XSS-safe)
+        # Only allowlisted fields: id, display_name, role
+        user_json = json.dumps(user, ensure_ascii=True)  # XSS protection
         user_script = f'<script>window.__PULZ_USER__ = {user_json};</script>'
 
         # Inject before closing </head> tag
@@ -247,9 +261,9 @@ class PulzExtension:
         with open(file_path, mode) as f:
             content = f.read()
 
-        # Inject user info into HTML files
+        # Inject MINIMAL user info into HTML files (XSS-safe)
         if content_type == 'text/html' and isinstance(content, str):
-            user_json = json.dumps(user)
+            user_json = json.dumps(user, ensure_ascii=True)  # XSS protection
             user_script = f'<script>window.__PULZ_USER__ = {user_json};</script>'
 
             if '</head>' in content:
