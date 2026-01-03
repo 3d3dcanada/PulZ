@@ -62,7 +62,7 @@ The boundary is enforced at the highest possible architectural level—the layou
 
 Location: `/src/components/Lobby.tsx`
 
-The lobby replaces the old passcode-only gate with a clear, educational interface.
+The lobby is a clear, educational interface with a single explicit acknowledgment action (no passwords).
 
 **Sections:**
 - **What is this gate?** - "An operator acknowledgment boundary for a live demo environment."
@@ -138,13 +138,13 @@ if (!isAuthorized) {
 
 **Issue:** Deep links completely bypassed the access gate.
 
-### Problem 4: No Educational Context
+### Problem 4: Fake Authentication Illusion
 ```tsx
-// OLD: Just a passcode form
+// OLD: Password-style gate in a static demo (no backend auth)
 <input type="password" placeholder="Enter access passcode" />
 ```
 
-**Issue:** Operators didn't understand what they were entering or why.
+**Issue:** This looked like real authentication despite having no backend identity. It creates a false sense of security and can lock out legitimate operators when retry/lockout logic is added.
 
 ## Why This Model Cannot Fail
 
@@ -206,16 +206,17 @@ if (now >= expires) {
 
 ### 4. Explicit Acknowledgment
 
-The lobby clearly states what's happening:
+The lobby requires a human to explicitly acknowledge a short statement and click to proceed:
 
 ```
-"I Understand. Enter System."
+[ ] I understand this is a demo control environment.
+[ Enter PulZ System ]
 ```
 
-Not "Login" or "Sign in"—operators are **acknowledging** they understand where they are.
+Not "Login" or "Sign in"—operators are **acknowledging** awareness, not proving identity.
 
-**Impossible to bypass because:**
-- Passcode is still required
+**Hard to bypass accidentally because:**
+- Nothing renders until a human clicks
 - Acknowledgment is explicit
 - Terms are clear before entry
 
@@ -236,11 +237,9 @@ The boundary serves to:
 3. Set expectations before entry
 4. Demonstrate the concept (not implement production auth)
 
-For production deployment, upgrade to:
-- Netlify Functions + JWT
-- Supabase Auth
-- Cloudflare Access
-- Or any server-side authentication
+Policy (PulZ compliance): authentication UX (passwords, attempt limits, recovery links) is not allowed in the demo boundary. If there is no backend identity provider, the UI must stay in acknowledgment mode only. This is recorded as INC-2026-001.
+
+For production deployment, replace this with real server-side access control (next phase: Supabase Identity Boundary).
 
 ## Testing the Boundary
 
@@ -253,7 +252,7 @@ For production deployment, upgrade to:
    - Clicking header → header doesn't render ✓
 
 2. **After acknowledgment:**
-   - Enter passcode → system unlocks ✓
+   - Check acknowledgment and click "Enter PulZ System" → system unlocks ✓
    - Visit any page → full system access ✓
    - Navigation works normally ✓
 
@@ -288,11 +287,11 @@ sessionStorage.clear()
 ### Files Modified:
 - `layout.tsx` - Added OperatorBoundary wrapper
 - `page.tsx` - Simplified to just redirect to /entry
-- `incidentLog.ts` - Added INC-2025-002
+- `incidentLog.ts` - Added INC-2025-002 and INC-2026-001
 
 ### Access Control Config:
-- `access.ts` - Still used for passcode verification
-- Can be upgraded to server-side auth later
+- `access.ts` - Used only to enable/disable the operator boundary (no passwords)
+- Next phase: Supabase Identity Boundary (real users, roles, and recovery)
 
 ## Future Layers (After 2.2)
 
