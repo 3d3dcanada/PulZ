@@ -1,10 +1,7 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import Navigation from '@/components/Navigation'
 import OperatorBoundary from '@/components/OperatorBoundary'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'PulZ Control Room - AI Orchestration OS',
@@ -34,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-control-bg text-control-text-primary antialiased selection:bg-control-accent/30`}>
+      <body className="font-sans bg-control-bg text-control-text-primary antialiased selection:bg-control-accent/30">
         <OperatorBoundary>
           <Navigation />
           <main className="min-h-screen">
