@@ -106,11 +106,54 @@ export function seedIncidentLog(): void {
       },
       resolution: {
         rootCause: 'Access control was page-specific rather than system-wide. The boundary needed to exist at the highest architectural level (layout) to ensure nothing could render or be navigated to before operator acknowledgment.',
-        preventionGate: 'Implemented global OperatorBoundary component at layout level. Created keyring.ts as single source of access truth. Lobby UI replaces passcode-only gate with clear explanation of purpose and limitations. All navigation now blocked until acknowledgment is granted.',
+        preventionGate: 'Implemented global OperatorBoundary component at layout level. Created keyring.ts as single source of access truth. Lobby UI provides a clear, honest operator acknowledgment (no passwords) before any system UI renders. All navigation is blocked until acknowledgment is granted.',
         verifiedAt: '2025-01-03T00:30:00Z',
         verifiedBy: 'cto.new',
       },
       closedAt: '2025-01-03T00:30:00Z',
+    })
+
+    // Fake authentication illusion incident
+    INCIDENT_LOG.push({
+      incident: {
+        id: 'INC-2026-001',
+        timestamp: '2026-01-03T00:00:00Z',
+        description: 'Fake authentication illusion in demo lobby UI',
+        deploymentMode: 'custom_domain',
+        probableCauses: [
+          'Password-style UI added without backend authentication',
+          'Email-style recovery link implied accounts and support workflow',
+          'Rate limiting and lockout logic copied from real auth patterns',
+        ],
+        status: 'resolved',
+        checks: [
+          {
+            passed: false,
+            message: 'Lobby UI implies password authentication',
+            details: 'Password input field and verification flow existed despite no server-side identity.',
+            timestamp: '2026-01-03T00:00:00Z',
+          },
+          {
+            passed: false,
+            message: 'Email recovery implied without accounts',
+            details: '"Request Access" mailto link suggested account-style access and recovery.',
+            timestamp: '2026-01-03T00:00:00Z',
+          },
+          {
+            passed: false,
+            message: 'Rate limiting and lockout created operator friction',
+            details: 'Attempt counters and cooldowns can lock out legitimate operators in a demo boundary.',
+            timestamp: '2026-01-03T00:00:00Z',
+          },
+        ],
+      },
+      resolution: {
+        rootCause: 'The lobby adopted password and recovery UX patterns without any real authentication backend, creating a false sense of security and potential operator lockout.',
+        preventionGate: 'Removed all password, retry/lockout, and email recovery UI. Replaced with a single explicit acknowledgment checkbox and an "Enter PulZ System" action, with plain-language honesty messaging. Rule: authentication UI is only allowed once a real backend identity system exists (next phase: Supabase).',
+        verifiedAt: '2026-01-03T00:15:00Z',
+        verifiedBy: 'cto.new',
+      },
+      closedAt: '2026-01-03T00:15:00Z',
     })
   }
 }

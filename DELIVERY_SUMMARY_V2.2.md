@@ -48,7 +48,7 @@ Successfully implemented a global, non-bypassable operator acknowledgment bounda
 ### Layer 3: Lobby UI
 **File Created:** `/control-room/src/components/Lobby.tsx`
 
-Replaces the old passcode-only AccessGate with an educational interface.
+Replaces the old AccessGate with an educational interface and a single explicit acknowledgment action (no passwords, no recovery).
 
 **Sections:**
 - **What is this gate?** - "An operator acknowledgment boundary for a live demo environment."
@@ -78,7 +78,9 @@ Replaces the old passcode-only AccessGate with an educational interface.
 ### Layer 5: Learning System Integration
 **File Modified:** `/control-room/src/learning/incidentLog.ts`
 
-Added incident INC-2025-002: "Operator boundary bypass via direct navigation"
+Added incidents:
+- INC-2025-002: "Operator boundary bypass via direct navigation"
+- INC-2026-001: "Fake authentication illusion in demo lobby UI"
 
 **Incident Details:**
 - **What happened:** Access gate was only on root page, navigation and deep links bypassed it
@@ -119,8 +121,8 @@ Navigation was always rendered in layout, even without authorization.
 ### Problem 3: Direct URL Bypass
 Deep links completely bypassed the access gate - visiting `/learning` directly showed full UI.
 
-### Problem 4: No Educational Context
-Just a passcode form - operators didn't understand what they were entering or why.
+### Problem 4: Fake Authentication Illusion
+Password-style UI (and related patterns) existed without backend identity, creating a false sense of security and potential operator lockout.
 
 ## Why This Model Cannot Fail
 
@@ -144,8 +146,8 @@ Access expires automatically. Impossible to bypass because:
 - Storage is cleared on expiration
 
 ### 4. Explicit Acknowledgment
-Lobby clearly states what's happening with "I Understand. Enter System."
-Not "Login" or "Sign in"—operators are **acknowledging** they understand where they are.
+Lobby requires a human to check an acknowledgment and click "Enter PulZ System" (no passwords).
+Not "Login" or "Sign in"—operators are **acknowledging** awareness, not proving identity.
 
 ## Security Honesty
 
@@ -162,11 +164,7 @@ A knowledgeable user can:
 3. Set expectations before entry
 4. Demonstrate the concept (not implement production auth)
 
-For production deployment, upgrade to:
-- Netlify Functions + JWT
-- Supabase Auth
-- Cloudflare Access
-- Or any server-side authentication
+For production deployment, replace this with real server-side access control (next phase: Supabase Identity Boundary).
 
 ## Build Status
 
@@ -198,7 +196,7 @@ All tests should pass in a brand-new Incognito session:
 ### Modified (3 files):
 - `/control-room/src/app/layout.tsx` - Added OperatorBoundary wrapper
 - `/control-room/src/app/page.tsx` - Simplified to redirect only
-- `/control-room/src/learning/incidentLog.ts` - Added INC-2025-002
+- `/control-room/src/learning/incidentLog.ts` - Added INC-2025-002 and INC-2026-001
 
 ### Deleted (1 file):
 - `/control-room/src/components/AccessGate.tsx` - Deprecated, replaced by Lobby

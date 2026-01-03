@@ -29,33 +29,24 @@
   - Keyboard navigation support
   - Governance principles display: Human Authority Required, Evidence-Gated, Append-Only Audit, Multi-Model Consensus
 
-### Phase D: Passcode-Gated Access Control ✅
-- ✅ Created `AccessGate.tsx` component:
-  - Client-side passcode validation (SHA-256 hash)
-  - Demo passcode: "PulZ2026"
-  - Session storage (8 hours) and localStorage (7 days with "Remember me")
-  - Rate limiting: 5 attempts, 1 minute cooldown
-  - Calm boot sequence with progress indicator
-  - Request Access (mailto) link
+### Phase D: Honest Operator Acknowledgment Boundary ✅
+- ✅ Implemented a global operator boundary (layout-level) with a Lobby UI:
+  - No passwords
+  - No attempt limits / cooldowns
+  - No email recovery or account flow
+  - Single explicit acknowledgment (checkbox) + one primary action ("Enter PulZ System")
 
-- ✅ Created `src/config/access.ts`:
-  - ACCESS_MODE: 'demo_gate' | 'disabled'
-  - PASSCODE_HASH: SHA-256 of "PulZ2026"
-  - REMEMBER_DAYS: 7
-  - MAX_ATTEMPTS: 5
-  - COOLDOWN_MS: 60000
-  - Complete upgrade path documentation (Netlify Functions, Supabase Auth, Cloudflare Access)
+- ✅ Implemented `src/config/keyring.ts`:
+  - Single source of truth for acknowledgment state
+  - Time-bounded sessions (8 hours default)
+  - Optional 7-day persistence ("Remember this acknowledgment")
 
-- ✅ Security honesty:
-  - Labeled as "Demo Access Gate (client-side)"
-  - Explicit disclaimer: "This is not true security"
-  - Toggle showing/hiding security information
-  - Upgrade path documented (implementation not included)
+- ✅ Updated `src/config/access.ts`:
+  - ACCESS_MODE now controls boundary on/off only (no passcode verification)
 
-- ✅ Updated home page (`/page.tsx`):
-  - Checks for access token on load
-  - Shows AccessGate if unauthorized
-  - Redirects to `/entry` when authorized
+- ✅ Updated routing:
+  - OperatorBoundary enforces the gate across all routes
+  - Root redirects to `/entry` after acknowledgment
 
 ### Phase E: Two-Strike Verification Protocol ✅
 - ✅ Created `kernel/learning/verificationChecklist.ts`:
@@ -133,16 +124,17 @@
 
 ### Production (Ready for Merge) ✅
 - ✅ Workflow will serve correct content based on deployment mode
-- ✅ Premium entry UI will be default landing after passcode
-- ✅ Access gate reliably blocks internal routes until passcode
+- ✅ Premium entry UI will be default landing after acknowledgment
+- ✅ Operator boundary reliably blocks internal routes until acknowledgment
 - ✅ Verification + learning artifacts exist and are usable
 - ✅ All changes committed and reviewable
 
 ## Security Honesty Compliance ✅
-- ✅ Passcode gate labeled as "Demo Access Gate (client-side)"
-- ✅ Explicit disclaimer that it's not true security
-- ✅ Client-side checks can be bypassed (acknowledged)
-- ✅ Upgrade path documented (Netlify Functions, Supabase Auth, Cloudflare Access)
+- ✅ Boundary is labeled as operator acknowledgment (not authentication)
+- ✅ No passwords, no recovery, no attempt limits / lockouts
+- ✅ Explicit disclaimer that it's client-side only (not real security)
+- ✅ Policy: authentication UI is only allowed once a real backend identity system exists
+- ✅ Next phase: Supabase Identity Boundary (real users, roles, recovery, audit)
 - ✅ No fear language - just truth
 
 ## Governance-First Tone ✅
@@ -161,8 +153,8 @@
 
 ### Completed ✅
 - ✅ Pages deployment fixed (workflow auto-detects deployment mode)
-- ✅ Entry UI will be default landing after passcode
-- ✅ Access gate reliably blocks internal routes until passcode
+- ✅ Entry UI will be default landing after acknowledgment
+- ✅ Operator boundary reliably blocks internal routes until acknowledgment
 - ✅ Verification + learning artifacts exist and are usable
 - ✅ All changes committed (ready for PR merge)
 
@@ -183,9 +175,11 @@
 - `control-room/src/app/learning/page.tsx` (new)
 - `control-room/src/app/page.tsx` (updated)
 - `control-room/src/app/settings/page.tsx` (new)
-- `control-room/src/components/AccessGate.tsx` (new)
+- `control-room/src/components/Lobby.tsx` (new)
+- `control-room/src/components/OperatorBoundary.tsx` (new)
+- `control-room/src/config/keyring.ts` (new)
 - `control-room/src/components/Navigation.tsx` (updated)
-- `control-room/src/config/access.ts` (new)
+- `control-room/src/config/access.ts` (updated)
 - `control-room/src/config/endpoints.ts` (new)
 - `control-room/src/learning/incidentLog.ts` (new)
 - `control-room/src/learning/index.ts` (new)
@@ -197,5 +191,5 @@
 - 834 insertions(+)
 - 186 deletions(-)
 
-## Demo Passcode
-For testing the access gate: **PulZ2026**
+## Demo Access
+No passwords are used. Check the acknowledgment and click "Enter PulZ System" to proceed.

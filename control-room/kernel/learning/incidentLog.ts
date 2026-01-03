@@ -68,6 +68,81 @@ export function seedIncidentLog(): void {
       },
       closedAt: '2025-01-02T19:30:00Z',
     })
+
+    // Add operator boundary bypass incident
+    INCIDENT_LOG.push({
+      incident: {
+        id: 'INC-2025-002',
+        timestamp: '2025-01-03T00:00:00Z',
+        description: 'Operator boundary bypass via direct navigation',
+        deploymentMode: 'custom_domain',
+        probableCauses: [
+          'Access gate implemented only on root page (/)',
+          'Navigation links accessible without authorization',
+          'Direct URLs could bypass the gate entirely',
+          'No global boundary enforcement at layout level',
+        ],
+        status: 'resolved',
+        checks: [
+          {
+            passed: false,
+            message: 'Operator boundary not enforced globally',
+            details: 'Access gate component only rendered on page.tsx. Navigation and other pages were reachable directly.',
+            timestamp: '2025-01-03T00:00:00Z',
+          },
+          {
+            passed: false,
+            message: 'Deep links bypass operator acknowledgment',
+            details: 'Visiting /learning, /settings, or /entry directly showed full UI without passing through the boundary.',
+            timestamp: '2025-01-03T00:00:00Z',
+          },
+        ],
+      },
+      resolution: {
+        rootCause: 'Access control was page-specific rather than system-wide. The boundary needed to exist at the highest architectural level (layout) to ensure nothing could render or be navigated to before operator acknowledgment.',
+        preventionGate: 'Implemented a global boundary at layout level with a single source of truth for access state. Lobby provides an explicit, honest operator acknowledgment (no passwords) before any system UI renders.',
+        verifiedAt: '2025-01-03T00:30:00Z',
+        verifiedBy: 'cto.new',
+      },
+      closedAt: '2025-01-03T00:30:00Z',
+    })
+
+    // Fake authentication illusion incident
+    INCIDENT_LOG.push({
+      incident: {
+        id: 'INC-2026-001',
+        timestamp: '2026-01-03T00:00:00Z',
+        description: 'Fake authentication illusion in demo lobby UI',
+        deploymentMode: 'custom_domain',
+        probableCauses: [
+          'Password-style UI added without backend authentication',
+          'Email-style recovery link implied accounts and support workflow',
+          'Rate limiting and lockout logic copied from real auth patterns',
+        ],
+        status: 'resolved',
+        checks: [
+          {
+            passed: false,
+            message: 'Lobby UI implies password authentication',
+            details: 'Password input field and verification flow existed despite no server-side identity.',
+            timestamp: '2026-01-03T00:00:00Z',
+          },
+          {
+            passed: false,
+            message: 'Email recovery implied without accounts',
+            details: '"Request Access" mailto link suggested account-style access and recovery.',
+            timestamp: '2026-01-03T00:00:00Z',
+          },
+        ],
+      },
+      resolution: {
+        rootCause: 'The lobby adopted password and recovery UX patterns without any real authentication backend, creating a false sense of security and potential operator lockout.',
+        preventionGate: 'Removed all password, retry/lockout, and email recovery UI. Replaced with a single explicit acknowledgment checkbox and an "Enter PulZ System" action, with plain-language honesty messaging. Rule: authentication UI is only allowed once a real backend identity system exists (next phase: Supabase).',
+        verifiedAt: '2026-01-03T00:15:00Z',
+        verifiedBy: 'cto.new',
+      },
+      closedAt: '2026-01-03T00:15:00Z',
+    })
   }
 }
 
