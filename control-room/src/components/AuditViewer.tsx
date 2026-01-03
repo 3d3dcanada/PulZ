@@ -3,11 +3,15 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { AuditEvent, globalAuditLog } from '../../kernel'
+import Tooltip from './literacy/Tooltip'
+import ExplainPanel from './literacy/ExplainPanel'
+import { Info } from 'lucide-react'
 
 export default function AuditViewer() {
   const [events, setEvents] = useState<readonly AuditEvent[]>([])
   const [selectedEvent, setSelectedEvent] = useState<AuditEvent | null>(null)
   const [isChainValid, setIsChainValid] = useState(true)
+  const [isExplainOpen, setIsExplainOpen] = useState(false)
 
   useEffect(() => {
     const loadEvents = () => {
@@ -88,7 +92,10 @@ export default function AuditViewer() {
                       <span className="text-control-text-secondary">Related:</span> {event.related.kind} {event.related.id}
                     </div>
                     <div className="font-mono text-[10px]">
-                      <span className="text-control-text-secondary">Hash:</span> {event.after_hash.slice(0, 12)}...
+                      <span className="text-control-text-secondary">Hash:</span>{' '}
+                      <Tooltip content="Cryptographic fingerprint ensuring this record hasn't been tampered with.">
+                        {event.after_hash.slice(0, 12)}...
+                      </Tooltip>
                     </div>
                   </div>
                   {event.notes && (
@@ -109,20 +116,29 @@ export default function AuditViewer() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60]"
             onClick={() => setSelectedEvent(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="glass-panel-bright p-8 max-w-2xl w-full"
+              className="glass-panel-bright p-8 max-w-2xl w-full relative"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-xl font-bold mb-6 text-control-accent">Event Details</h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-control-accent">Event Details</h3>
+                <button
+                  onClick={() => setIsExplainOpen(true)}
+                  className="flex items-center gap-2 px-3 py-1 bg-control-accent/10 hover:bg-control-accent/20 rounded text-xs text-control-accent transition-colors"
+                >
+                  <Info className="w-3 h-3" />
+                  Explain This
+                </button>
+              </div>
               <div className="space-y-4 font-mono text-sm">
                 <div>
-                  <div className="text-control-text-muted text-xs mb-1">ID</div>
+                  <div className="text-control-text-muted text-xs mb-1 uppercase tracking-widest">ID</div>
                   <div className="text-control-text-primary">{selectedEvent.id}</div>
                 </div>
                 <div>
@@ -172,6 +188,13 @@ export default function AuditViewer() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ExplainPanel 
+        isOpen={isExplainOpen} 
+        onClose={() => setIsExplainOpen(false)} 
+        type="AuditEvent" 
+        data={selectedEvent}
+      />
     </div>
   )
 }
