@@ -11,6 +11,15 @@ export {
 } from './primitives/EvidenceReport';
 
 export {
+  type GovernanceActionClass,
+  type ApprovalState,
+  type EvidenceTier,
+  type ApprovalRoute,
+  GOVERNANCE_ACTION_CLASS_DEFINITIONS,
+  EVIDENCE_TIER_DEFINITIONS,
+} from './primitives/GovernanceTypes';
+
+export {
   type ActionClass,
   type ConfidenceLevel,
   CONFIDENCE_RUBRIC,
@@ -44,6 +53,19 @@ export {
   validateEvidenceReport,
   calculateConfidenceScore,
 } from './validators/evidenceValidator';
+
+export {
+  type EvidenceTierResult,
+  determineEvidenceTier,
+  isEvidenceTierAtLeast,
+} from './policies/evidencePolicy';
+
+export {
+  type ActionClassInput,
+  type ActionClassResult,
+  determineActionClass,
+  advanceApprovalState,
+} from './policies/actionClassPolicy';
 
 export {
   validateDecisionFrame,

@@ -1007,3 +1007,28 @@ Hybrid Lovable + Claude execution
 And Nemotron fits cleanly as the overnight bulk processor lane with long context, while Claude/GPT handle final reasoning + polish + PR-quality changes. 
 NVIDIA NIM APIs
 +1
+
+--- Phase C Addendum: Governance & Persistence (2026) ---
+
+Action Classes (A/B/C)
+- Type A: Log + Learn only. No execution path.
+- Type B: Draft + single approval required.
+- Type C: Full evidence + multi-gate approval required.
+
+Approval States
+- log_only, drafted, awaiting_single_approval, awaiting_multi_gate, approved, blocked, rejected.
+
+Evidence Tiers
+- tier_1: single-source or uncorroborated evidence.
+- tier_2: multi-source evidence with partial verification.
+- tier_3: multi-source, verified evidence with traceable provenance.
+
+Model Routing Lanes
+- Reasoning/Synthesis lane (governance decisions).
+- Overnight Long-Context lane (batch digestion, summaries).
+- Fast Classification lane (routing, tagging, triage).
+
+Memory & Persistence Foundations
+- Opportunities, Evidence Reports, Decision Frames, Audit Events, Learning Outcomes.
+- Append-only audit log with cryptographic hash chaining.
+- Schema scaffolding tracked in /docs/phase-c/03-supabase-schema.sql.

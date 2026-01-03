@@ -67,6 +67,10 @@ export function validateEvidenceReport(report: EvidenceReport): ValidationResult
     errors.push('EvidenceReport confidence_score must be a number between 0 and 100');
   }
 
+  if (!['tier_1', 'tier_2', 'tier_3'].includes(report.evidence_tier)) {
+    errors.push('EvidenceReport evidence_tier must be tier_1, tier_2, or tier_3');
+  }
+
   if (!report.coverage_summary || report.coverage_summary.trim() === '') {
     errors.push('EvidenceReport must have a non-empty coverage_summary');
   }
