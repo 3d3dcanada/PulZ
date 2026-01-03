@@ -137,7 +137,7 @@ export default function LibraryPage() {
       <div className="mt-16">
         <LearnMore title="Why is the Library separated from the Control Room?">
           <p>
-            The Control Room is for real-time orchestration and high-stakes decision making. The Library serves as the long-term memory and context provider. By separating concern, we ensure that operators are not overwhelmed by documentation while trying to manage active AI processes, while still maintaining 1-click access to the "why" behind every system object.
+            The Control Room is for real-time orchestration and high-stakes decision making. The Library serves as the long-term memory and context provider. By separating concern, we ensure that operators are not overwhelmed by documentation while trying to manage active AI processes, while still maintaining 1-click access to the &quot;why&quot; behind every system object.
           </p>
         </LearnMore>
       </div>
