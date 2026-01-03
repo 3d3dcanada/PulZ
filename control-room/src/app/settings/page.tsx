@@ -2,18 +2,21 @@
 
 import { motion } from 'framer-motion'
 import { ENDPOINT_SLOTS, getEndpointStats } from '@/config/endpoints'
+import { MODEL_ROUTES } from '@/config/modelRouting'
 import Tooltip from '@/components/literacy/Tooltip'
-import ExplainPanel from '@/components/literacy/ExplainPanel'
+import ExplainPanel, { type ExplainerType } from '@/components/literacy/ExplainPanel'
 import { Info } from 'lucide-react'
 import { useState } from 'react'
 
 export default function SettingsPage() {
   const stats = getEndpointStats()
   const [isExplainOpen, setIsExplainOpen] = useState(false)
-  const [selectedEndpoint, setSelectedEndpoint] = useState<any>(null)
+  const [selectedExplainData, setSelectedExplainData] = useState<any>(null)
+  const [selectedExplainType, setSelectedExplainType] = useState<ExplainerType>('EndpointSlot')
 
-  const openExplain = (endpoint: any) => {
-    setSelectedEndpoint(endpoint)
+  const openExplain = (type: ExplainerType, data: any) => {
+    setSelectedExplainType(type)
+    setSelectedExplainData(data)
     setIsExplainOpen(true)
   }
 
@@ -136,7 +139,7 @@ export default function SettingsPage() {
                   
                   <div className="flex flex-col items-end gap-3">
                     <button
-                      onClick={() => openExplain(endpoint)}
+                      onClick={() => openExplain('EndpointSlot', endpoint)}
                       className="p-1.5 hover:bg-control-accent/10 rounded transition-colors text-control-text-secondary hover:text-control-accent"
                       title="Explain this endpoint"
                     >
@@ -153,6 +156,76 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Model Routing */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mb-12"
+        >
+          <h2 className="text-2xl font-bold mb-6 tracking-tight flex items-center gap-3">
+            <span className="text-control-accent">🧭</span>
+            Model Routing Lanes
+          </h2>
+          <div className="space-y-4">
+            {MODEL_ROUTES.map((route) => (
+              <div
+                key={route.id}
+                className="glass-panel-bright p-6 border-l-4 border-l-control-accent"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-base font-bold text-control-text-primary">
+                        {route.label}
+                      </h3>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-control-accent/20 text-control-accent">
+                        {route.lane.replace('_', ' ')}
+                      </span>
+                    </div>
+                    <p className="text-sm text-control-text-secondary">
+                      {route.description}
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 text-xs">
+                      <div>
+                        <span className="text-control-text-muted uppercase tracking-tighter">Primary:</span>{' '}
+                        <span className="text-control-text-primary font-mono">{route.primary_model}</span>
+                      </div>
+                      <div>
+                        <span className="text-control-text-muted uppercase tracking-tighter">Secondary:</span>{' '}
+                        <span className="text-control-text-primary font-mono">{route.secondary_model}</span>
+                      </div>
+                      <div>
+                        <span className="text-control-text-muted uppercase tracking-tighter">Timeout:</span>{' '}
+                        <span className="text-control-text-primary">{route.default_timeout_seconds}s</span>
+                      </div>
+                      <div>
+                        <span className="text-control-text-muted uppercase tracking-tighter">Confidence Target:</span>{' '}
+                        <span className="text-control-text-primary">{route.confidence_target}%</span>
+                      </div>
+                    </div>
+                    <div className="mt-3 text-xs text-control-text-secondary">
+                      <div className="text-control-text-muted uppercase tracking-widest mb-2">Routing Rules</div>
+                      <ul className="space-y-1">
+                        {route.routing_rules.map((rule) => (
+                          <li key={rule}>• {rule}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => openExplain('ModelRoute', route)}
+                    className="p-1.5 hover:bg-control-accent/10 rounded transition-colors text-control-text-secondary hover:text-control-accent"
+                    title="Explain this routing lane"
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         </motion.div>
@@ -183,8 +256,8 @@ export default function SettingsPage() {
       <ExplainPanel 
         isOpen={isExplainOpen} 
         onClose={() => setIsExplainOpen(false)} 
-        type="EndpointSlot" 
-        data={selectedEndpoint}
+        type={selectedExplainType} 
+        data={selectedExplainData}
       />
     </div>
   )

@@ -4,7 +4,16 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info, Shield, Activity, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 
-export type ExplainerType = 'EvidenceItem' | 'EvidenceReport' | 'DecisionFrame' | 'AuditEvent' | 'EndpointSlot';
+export type ExplainerType =
+  | 'EvidenceItem'
+  | 'EvidenceReport'
+  | 'DecisionFrame'
+  | 'AuditEvent'
+  | 'EndpointSlot'
+  | 'ActionClass'
+  | 'ApprovalState'
+  | 'EvidenceTier'
+  | 'ModelRoute';
 
 interface ExplainPanelProps {
   isOpen: boolean;
@@ -61,6 +70,42 @@ const explainers: Record<ExplainerType, {
       { label: 'What it is', content: 'A placeholder for a specific AI model or tool integration (e.g., Claude 3.5, GPT-4o, NVIDIA NIM).' },
       { label: 'Why it exists', content: 'To allow the system to swap models or providers without changing the underlying governance logic.' },
       { label: 'Configuration', content: 'Each slot holds the necessary API keys and parameters to talk to the provider.' },
+    ]
+  },
+  ActionClass: {
+    title: 'Action Class',
+    icon: <Shield className="w-5 h-5" />,
+    sections: [
+      { label: 'Type A', content: 'Log + learn only. No execution path.' },
+      { label: 'Type B', content: 'Draft + single approval required before any action.' },
+      { label: 'Type C', content: 'Full evidence + multi-gate approval required.' },
+    ]
+  },
+  ApprovalState: {
+    title: 'Approval State',
+    icon: <CheckCircle2 className="w-5 h-5" />,
+    sections: [
+      { label: 'What it is', content: 'The current governance gate position for a decision frame.' },
+      { label: 'Why it exists', content: 'To show operators exactly which human approvals are pending.' },
+      { label: 'How it changes', content: 'States advance only when explicit approvals are recorded.' },
+    ]
+  },
+  EvidenceTier: {
+    title: 'Evidence Tier',
+    icon: <FileText className="w-5 h-5" />,
+    sections: [
+      { label: 'Tier 1', content: 'Single-source or uncorroborated evidence. Log only.' },
+      { label: 'Tier 2', content: 'Multi-source evidence with partial verification.' },
+      { label: 'Tier 3', content: 'Multi-source, verified evidence with traceable provenance.' },
+    ]
+  },
+  ModelRoute: {
+    title: 'Model Route',
+    icon: <Activity className="w-5 h-5" />,
+    sections: [
+      { label: 'What it is', content: 'A defined lane for routing tasks to models based on purpose and latency.' },
+      { label: 'Why it exists', content: 'To keep reasoning, classification, and long-context work separated and auditable.' },
+      { label: 'How it is used', content: 'Routing rules select the model lane before any prompt is dispatched.' },
     ]
   }
 };

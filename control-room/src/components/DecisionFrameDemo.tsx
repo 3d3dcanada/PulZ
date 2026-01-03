@@ -73,6 +73,7 @@ export default function DecisionFrameDemo() {
       items,
       coverage_summary: 'All governance requirements covered by verified sources',
       confidence_score: confidence,
+      evidence_tier: 'tier_3',
       limitations: ['Demo context only', 'Simplified evidence chain'],
       assumptions: ['User has reviewed PulZ Bible', 'Current governance policy active'],
     })
@@ -97,6 +98,7 @@ export default function DecisionFrameDemo() {
       objective: 'Demonstrate kernel-enforced governance with approval gate',
       recommendation: 'Show how evidence gating and confidence scoring prevent silent execution',
       evidence_report_id: evidenceReport.id,
+      evidence_tier: evidenceReport.evidence_tier,
       confidence_score: evidenceReport.confidence_score,
     })
 
@@ -262,6 +264,12 @@ export default function DecisionFrameDemo() {
                   </Tooltip>
                 </div>
                 <div>
+                  <span className="text-control-text-muted">Evidence Tier:</span>{' '}
+                  <Tooltip content="Tier 1 = log only, Tier 2 = single approval, Tier 3 = multi-gate readiness.">
+                    <span className="text-control-text-primary font-mono">{evidenceReport.evidence_tier}</span>
+                  </Tooltip>
+                </div>
+                <div>
                   <span className="text-control-text-muted">Coverage:</span>{' '}
                   <span className="text-control-text-primary">{evidenceReport.coverage_summary}</span>
                 </div>
@@ -347,6 +355,18 @@ export default function DecisionFrameDemo() {
                       </div>
                     </Tooltip>
                   </div>
+                  <div>
+                    <span className="text-control-text-muted text-xs uppercase tracking-widest">Action Class:</span>
+                    <Tooltip content="Type A = log only, Type B = single approval, Type C = multi-gate.">
+                      <div className="font-bold text-control-accent">Type {decisionFrame.action_class}</div>
+                    </Tooltip>
+                  </div>
+                  <div>
+                    <span className="text-control-text-muted text-xs uppercase tracking-widest">Approval State:</span>
+                    <Tooltip content="Current governance gate position for this decision.">
+                      <div className="font-mono text-control-text-primary">{decisionFrame.approval_state}</div>
+                    </Tooltip>
+                  </div>
                 </div>
                 <div>
                   <span className="text-control-text-muted text-xs uppercase tracking-widest">Status:</span>
@@ -391,6 +411,16 @@ export default function DecisionFrameDemo() {
                 This decision requires explicit human approval. The kernel prevents silent execution.
               </p>
               <div className="space-y-2 text-xs">
+                <div className="flex items-center space-x-2">
+                  <span className="text-control-text-muted">Action Class:</span>
+                  <span className="text-control-accent font-bold">Type {decisionFrame.action_class}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-control-text-muted">Approval Route:</span>
+                  <span className="text-control-text-primary font-mono">
+                    {decisionFrame.approval_route}
+                  </span>
+                </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-control-text-muted">Approval Required:</span>
                   <span className="text-control-error font-bold">

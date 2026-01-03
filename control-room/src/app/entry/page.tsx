@@ -8,7 +8,7 @@ const ENTRY_FEATURES = [
     id: 'control-room',
     title: 'Control Room',
     description: 'Full governance interface with real-time confidence scoring, consensus validation, and audit trails.',
-    href: '/governance',
+    href: '/control-room',
     icon: '⚡',
     color: 'from-blue-500/20 to-cyan-500/20',
     borderColor: 'border-blue-500/30',

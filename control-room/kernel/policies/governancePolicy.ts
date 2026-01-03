@@ -1,5 +1,6 @@
 import { DecisionFrame, DecisionStatus } from '../primitives/DecisionFrame';
 import { canTransition } from '../validators/decisionValidator';
+import { isEvidenceTierAtLeast } from './evidencePolicy';
 
 export interface GovernanceCheck {
   passed: boolean;
@@ -51,6 +52,14 @@ export function checkEvidenceRequirements(frame: DecisionFrame): GovernanceCheck
 
   if (frame.confidence_score < 50) {
     violations.push('Confidence score below minimum threshold (50) - decision blocked');
+  }
+
+  if (frame.action_class === 'B' && !isEvidenceTierAtLeast(frame.evidence_tier, 'tier_2')) {
+    violations.push('Type B action requires evidence_tier tier_2 or higher');
+  }
+
+  if (frame.action_class === 'C' && !isEvidenceTierAtLeast(frame.evidence_tier, 'tier_3')) {
+    violations.push('Type C action requires evidence_tier tier_3');
   }
 
   return {
