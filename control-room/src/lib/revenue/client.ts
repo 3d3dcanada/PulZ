@@ -28,6 +28,12 @@ import {
   JobStatus,
   ServiceType,
 } from './types';
+import { getPulzUserId } from '@/lib/pulz/user';
+import {
+  clearMockStoreSnapshot,
+  loadMockStoreSnapshot,
+  persistMockStoreSnapshot,
+} from './storage';
 
 // ============================================================================
 // ENVIRONMENT DETECTION
@@ -49,13 +55,76 @@ class MockStore {
   private fulfillmentSteps: Map<string, FulfillmentStep> = new Map();
   private revenueEvents: Map<string, RevenueEvent> = new Map();
   private idCounter = 0;
+  private userId: string | null = null;
 
   generateId(): string {
     return `mock-${Date.now()}-${++this.idCounter}`;
   }
 
+  private ensureUserContext(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const currentUserId = getPulzUserId();
+    if (this.userId === currentUserId) {
+      return;
+    }
+
+    this.userId = currentUserId;
+    this.loadFromStorage();
+  }
+
+  private loadFromStorage(): void {
+    if (!this.userId || typeof window === 'undefined') {
+      return;
+    }
+
+    const snapshot = loadMockStoreSnapshot(this.userId);
+    this.opportunities = new Map(snapshot.opportunities.map((item) => [item.id, item]));
+    this.drafts = new Map(snapshot.drafts.map((item) => [item.id, item]));
+    this.jobs = new Map(snapshot.jobs.map((item) => [item.id, item]));
+    this.fulfillmentSteps = new Map(
+      snapshot.fulfillmentSteps.map((item) => [item.id, item])
+    );
+    this.revenueEvents = new Map(
+      snapshot.revenueEvents.map((item) => [item.id, item])
+    );
+    this.idCounter = snapshot.idCounter;
+  }
+
+  private persist(): void {
+    if (!this.userId || typeof window === 'undefined') {
+      return;
+    }
+
+    persistMockStoreSnapshot(this.userId, {
+      opportunities: Array.from(this.opportunities.values()),
+      drafts: Array.from(this.drafts.values()),
+      jobs: Array.from(this.jobs.values()),
+      fulfillmentSteps: Array.from(this.fulfillmentSteps.values()),
+      revenueEvents: Array.from(this.revenueEvents.values()),
+      idCounter: this.idCounter,
+    });
+  }
+
+  reset(): void {
+    this.ensureUserContext();
+    this.opportunities.clear();
+    this.drafts.clear();
+    this.jobs.clear();
+    this.fulfillmentSteps.clear();
+    this.revenueEvents.clear();
+    this.idCounter = 0;
+
+    if (this.userId) {
+      clearMockStoreSnapshot(this.userId);
+    }
+  }
+
   // Opportunities
   createOpportunity(input: CreateOpportunityInput): Opportunity {
+    this.ensureUserContext();
     const id = this.generateId();
     const now = new Date().toISOString();
 
@@ -90,14 +159,17 @@ class MockStore {
     };
 
     this.opportunities.set(id, opportunity);
+    this.persist();
     return opportunity;
   }
 
   getOpportunity(id: string): Opportunity | null {
+    this.ensureUserContext();
     return this.opportunities.get(id) ?? null;
   }
 
   listOpportunities(): Opportunity[] {
+    this.ensureUserContext();
     return Array.from(this.opportunities.values()).sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
@@ -105,6 +177,7 @@ class MockStore {
 
   // Drafts
   createDraft(input: CreateDraftInput): Draft {
+    this.ensureUserContext();
     const id = this.generateId();
     const now = new Date().toISOString();
 
@@ -135,20 +208,24 @@ class MockStore {
     };
 
     this.drafts.set(id, draft);
+    this.persist();
     return draft;
   }
 
   getDraft(id: string): Draft | null {
+    this.ensureUserContext();
     return this.drafts.get(id) ?? null;
   }
 
   listDraftsByOpportunity(opportunityId: string): Draft[] {
+    this.ensureUserContext();
     return Array.from(this.drafts.values())
       .filter((d) => d.opportunity_id === opportunityId)
       .sort((a, b) => b.version - a.version);
   }
 
   approveDraft(input: ApproveDraftInput): Draft | null {
+    this.ensureUserContext();
     const draft = this.drafts.get(input.draft_id);
     if (!draft) return null;
 
@@ -167,11 +244,13 @@ class MockStore {
     };
 
     this.drafts.set(input.draft_id, updated);
+    this.persist();
     return updated;
   }
 
   // Jobs
   createJob(input: CreateJobInput): Job {
+    this.ensureUserContext();
     const id = this.generateId();
     const now = new Date().toISOString();
 
@@ -202,20 +281,24 @@ class MockStore {
     };
 
     this.jobs.set(id, job);
+    this.persist();
     return job;
   }
 
   getJob(id: string): Job | null {
+    this.ensureUserContext();
     return this.jobs.get(id) ?? null;
   }
 
   listJobs(): Job[] {
+    this.ensureUserContext();
     return Array.from(this.jobs.values()).sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
   }
 
   updateJobStatus(input: UpdateJobStatusInput): Job | null {
+    this.ensureUserContext();
     const job = this.jobs.get(input.job_id);
     if (!job) return null;
 
@@ -239,6 +322,7 @@ class MockStore {
     }
 
     this.jobs.set(input.job_id, updated);
+    this.persist();
 
     // Create fulfillment step
     this.createFulfillmentStep({
@@ -254,6 +338,7 @@ class MockStore {
 
   // Fulfillment Steps
   createFulfillmentStep(input: CreateFulfillmentStepInput): FulfillmentStep {
+    this.ensureUserContext();
     const id = this.generateId();
     const now = new Date().toISOString();
 
@@ -269,10 +354,12 @@ class MockStore {
     };
 
     this.fulfillmentSteps.set(id, step);
+    this.persist();
     return step;
   }
 
   listFulfillmentStepsByJob(jobId: string): FulfillmentStep[] {
+    this.ensureUserContext();
     return Array.from(this.fulfillmentSteps.values())
       .filter((s) => s.job_id === jobId)
       .sort(
@@ -282,6 +369,7 @@ class MockStore {
 
   // Revenue Events
   createRevenueEvent(input: CreateRevenueEventInput): RevenueEvent {
+    this.ensureUserContext();
     const id = this.generateId();
     const now = new Date().toISOString();
 
@@ -300,10 +388,12 @@ class MockStore {
     };
 
     this.revenueEvents.set(id, event);
+    this.persist();
     return event;
   }
 
   listRevenueEventsByJob(jobId: string): RevenueEvent[] {
+    this.ensureUserContext();
     return Array.from(this.revenueEvents.values())
       .filter((e) => e.job_id === jobId)
       .sort(
@@ -313,6 +403,7 @@ class MockStore {
   }
 
   listAllRevenueEvents(): RevenueEvent[] {
+    this.ensureUserContext();
     return Array.from(this.revenueEvents.values()).sort(
       (a, b) =>
         new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
@@ -321,6 +412,7 @@ class MockStore {
 
   // Aggregate queries
   getOpportunityWithDrafts(id: string): OpportunityWithDrafts | null {
+    this.ensureUserContext();
     const opportunity = this.getOpportunity(id);
     if (!opportunity) return null;
 
@@ -331,6 +423,7 @@ class MockStore {
   }
 
   getJobWithDetails(id: string): JobWithDetails | null {
+    this.ensureUserContext();
     const job = this.getJob(id);
     if (!job) return null;
 
@@ -349,6 +442,7 @@ class MockStore {
   }
 
   getRevenueSummary(): RevenueSummary {
+    this.ensureUserContext();
     const jobs = this.listJobs();
     const revenueEvents = this.listAllRevenueEvents();
 
@@ -624,5 +718,11 @@ export const revenueApi = {
       return await supabaseClient.getRevenueSummary();
     }
     return mockStore.getRevenueSummary();
+  },
+
+  resetLocalData: (): void => {
+    if (!USE_SUPABASE) {
+      mockStore.reset();
+    }
   },
 };

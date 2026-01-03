@@ -137,6 +137,12 @@ export default function OpportunitiesPage() {
           </div>
           <div className="flex gap-4">
             <Link
+              href="/pulz"
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition"
+            >
+              Dashboard
+            </Link>
+            <Link
               href="/pulz/drafts"
               className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition"
             >
@@ -153,6 +159,12 @@ export default function OpportunitiesPage() {
               className="px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded-lg transition"
             >
               Revenue
+            </Link>
+            <Link
+              href="/pulz/activity"
+              className="px-4 py-2 bg-slate-600 hover:bg-slate-700 rounded-lg transition"
+            >
+              Activity
             </Link>
             <button
               onClick={() => setShowForm(!showForm)}
