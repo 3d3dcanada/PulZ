@@ -12,6 +12,8 @@
  * "Has this operator acknowledged entry into the PulZ system?"
  */
 
+import { getPulzUserId } from '@/lib/pulz/user'
+
 export interface OperatorState {
   /**
    * Whether the operator has acknowledged entry
@@ -59,9 +61,22 @@ export interface KeyringConfig {
 const KEYRING_CONFIG: KeyringConfig = {
   DEFAULT_SESSION_MS: 8 * 60 * 60 * 1000, // 8 hours
   MAX_SESSION_MS: 7 * 24 * 60 * 60 * 1000, // 7 days
-  SESSION_KEY: 'pulz_keyring_session',
-  PERSIST_KEY: 'pulz_keyring_remember',
+  SESSION_KEY: 'keyring_session',
+  PERSIST_KEY: 'keyring_remember',
 } as const
+
+function getNamespacedKey(suffix: string): string {
+  const userId = getPulzUserId()
+  return `pulz:${userId}:${suffix}`
+}
+
+function getSessionKey(): string {
+  return getNamespacedKey(KEYRING_CONFIG.SESSION_KEY)
+}
+
+function getPersistKey(): string {
+  return getNamespacedKey(KEYRING_CONFIG.PERSIST_KEY)
+}
 
 /**
  * Generate a unique session ID
@@ -85,7 +100,7 @@ export function getOperatorState(): OperatorState {
   }
 
   // Check persistent storage first
-  const persistData = localStorage.getItem(KEYRING_CONFIG.PERSIST_KEY)
+  const persistData = localStorage.getItem(getPersistKey())
   if (persistData) {
     try {
       const state = JSON.parse(persistData) as OperatorState
@@ -105,7 +120,7 @@ export function getOperatorState(): OperatorState {
   }
 
   // Check session storage
-  const sessionData = sessionStorage.getItem(KEYRING_CONFIG.SESSION_KEY)
+  const sessionData = sessionStorage.getItem(getSessionKey())
   if (sessionData) {
     try {
       const state = JSON.parse(sessionData) as OperatorState
@@ -159,7 +174,7 @@ export function grantAccess(remember: boolean = false): OperatorState {
   // Store in appropriate location (browser only)
   if (typeof window !== 'undefined') {
     const storage = remember ? localStorage : sessionStorage
-    const key = remember ? KEYRING_CONFIG.PERSIST_KEY : KEYRING_CONFIG.SESSION_KEY
+    const key = remember ? getPersistKey() : getSessionKey()
 
     storage.setItem(key, JSON.stringify(state))
   }
@@ -179,8 +194,8 @@ export function revokeAccess(): void {
  */
 export function clearKeyring(): void {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem(KEYRING_CONFIG.PERSIST_KEY)
-    sessionStorage.removeItem(KEYRING_CONFIG.SESSION_KEY)
+    localStorage.removeItem(getPersistKey())
+    sessionStorage.removeItem(getSessionKey())
   }
 }
 
@@ -213,7 +228,7 @@ export function getSessionInfo(): {
 } {
   const state = getOperatorState()
   const timeRemaining = getTimeRemaining()
-  const isRemembered = typeof window !== 'undefined' && localStorage.getItem(KEYRING_CONFIG.PERSIST_KEY) !== null
+  const isRemembered = typeof window !== 'undefined' && localStorage.getItem(getPersistKey()) !== null
 
   return {
     acknowledged: state.acknowledged,

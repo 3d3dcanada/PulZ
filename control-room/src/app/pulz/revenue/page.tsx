@@ -137,6 +137,12 @@ export default function RevenuePage() {
           </div>
           <div className="flex gap-4">
             <Link
+              href="/pulz"
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition"
+            >
+              Dashboard
+            </Link>
+            <Link
               href="/pulz/opportunities"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
             >
@@ -153,6 +159,12 @@ export default function RevenuePage() {
               className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition"
             >
               Jobs
+            </Link>
+            <Link
+              href="/pulz/activity"
+              className="px-4 py-2 bg-slate-600 hover:bg-slate-700 rounded-lg transition"
+            >
+              Activity
             </Link>
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
