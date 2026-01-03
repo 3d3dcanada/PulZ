@@ -6,10 +6,14 @@
  *
  * Track jobs through their lifecycle: approved → printing → post_processing → packed → shipped → paid
  * Supports both physical (3D printing) and software (consulting/dev) jobs.
+ *
+ * 🔐 Authentication required - protected by AuthGuard.
  */
 
 import { useState, useEffect } from 'react';
 import { revenueApi } from '@/lib/revenue/client';
+import { AuthGuard } from '@/lib/auth/AuthGuard';
+import { useAuth } from '@/lib/auth/AuthContext';
 import {
   Job,
   JobStatus,
@@ -29,6 +33,7 @@ const JOB_STATUSES: JobStatus[] = [
 ];
 
 export default function JobsPage() {
+  const { user } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [approvedDrafts, setApprovedDrafts] = useState<Draft[]>([]);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
@@ -129,7 +134,7 @@ export default function JobsPage() {
       await revenueApi.updateJobStatus({
         job_id: jobId,
         status: newStatus,
-        updated_by: 'operator', // TODO: Use actual user ID when auth is implemented
+        updated_by: user?.id || 'unknown',
         notes: `Status changed to ${newStatus}`,
       });
 
@@ -159,8 +164,9 @@ export default function JobsPage() {
   }, {} as Record<JobStatus, Job[]>);
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] text-white p-8">
-      <div className="max-w-7xl mx-auto">
+    <AuthGuard>
+      <div className="min-h-screen bg-[#0a0e1a] text-white p-8">
+        <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -335,7 +341,8 @@ export default function JobsPage() {
             ))}
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }

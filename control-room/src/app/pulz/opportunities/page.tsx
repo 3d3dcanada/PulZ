@@ -6,10 +6,14 @@
  *
  * Real opportunity intake form with validation and persistence.
  * Supports dual service types: physical (3D printing) and software (consulting/dev).
+ *
+ * 🔐 Authentication required - protected by AuthGuard.
  */
 
 import { useState, useEffect } from 'react';
 import { revenueApi } from '@/lib/revenue/client';
+import { AuthGuard } from '@/lib/auth/AuthGuard';
+import { useAuth } from '@/lib/auth/AuthContext';
 import {
   ServiceType,
   CreateOpportunityInput,
@@ -19,6 +23,7 @@ import {
 import Link from 'next/link';
 
 export default function OpportunitiesPage() {
+  const { user } = useAuth();
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -125,8 +130,9 @@ export default function OpportunitiesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] text-white p-8">
-      <div className="max-w-7xl mx-auto">
+    <AuthGuard>
+      <div className="min-h-screen bg-[#0a0e1a] text-white p-8">
+        <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -457,7 +463,8 @@ export default function OpportunitiesPage() {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }

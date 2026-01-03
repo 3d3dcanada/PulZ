@@ -6,10 +6,14 @@
  *
  * Track revenue events and view financial summary.
  * Append-only event log for accounting compliance.
+ *
+ * 🔐 Authentication required - protected by AuthGuard.
  */
 
 import { useState, useEffect } from 'react';
 import { revenueApi } from '@/lib/revenue/client';
+import { AuthGuard } from '@/lib/auth/AuthGuard';
+import { useAuth } from '@/lib/auth/AuthContext';
 import {
   RevenueEvent,
   CreateRevenueEventInput,
@@ -19,6 +23,7 @@ import {
 import Link from 'next/link';
 
 export default function RevenuePage() {
+  const { user } = useAuth();
   const [revenueEvents, setRevenueEvents] = useState<RevenueEvent[]>([]);
   const [summary, setSummary] = useState<RevenueSummary | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -78,7 +83,7 @@ export default function RevenuePage() {
 
     const input: CreateRevenueEventInput = {
       ...formData,
-      created_by: 'operator', // TODO: Use actual user ID when auth is implemented
+      created_by: user?.id || 'unknown',
     };
 
     try {
@@ -125,8 +130,9 @@ export default function RevenuePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] text-white p-8">
-      <div className="max-w-7xl mx-auto">
+    <AuthGuard>
+      <div className="min-h-screen bg-[#0a0e1a] text-white p-8">
+        <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -412,7 +418,8 @@ export default function RevenuePage() {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }
