@@ -103,6 +103,8 @@ export default function PulzDashboardPage() {
   ])
   const [authRequired, setAuthRequired] = useState(false)
   const [missionError, setMissionError] = useState<string | null>(null)
+  const [backendConnected, setBackendConnected] = useState<boolean | null>(null)
+  const [backendError, setBackendError] = useState<string | null>(null)
 
   const sourceSummary = useMemo(
     () => selectedSources.map((source) => SOURCE_OPTIONS.find((s) => s.id === source)?.label ?? source),
@@ -117,6 +119,20 @@ export default function PulzDashboardPage() {
     }
     const data = (await response.json()) as MissionStatus
     setStatus(data)
+  }, [])
+
+  const fetchConfig = useCallback(async () => {
+    try {
+      const response = await fetch('/api/config')
+      if (!response.ok) {
+        throw new Error(`Config check failed: ${response.status}`)
+      }
+      setBackendConnected(true)
+      setBackendError(null)
+    } catch (error) {
+      setBackendConnected(false)
+      setBackendError(error instanceof Error ? error.message : 'Backend unavailable')
+    }
   }, [])
 
   const fetchQueue = useCallback(async () => {
@@ -143,13 +159,15 @@ export default function PulzDashboardPage() {
     fetchStatus()
     fetchQueue()
     fetchArtifacts()
+    fetchConfig()
     const interval = setInterval(() => {
       fetchStatus()
       fetchQueue()
       fetchArtifacts()
+      fetchConfig()
     }, 15000)
     return () => clearInterval(interval)
-  }, [fetchArtifacts, fetchQueue, fetchStatus])
+  }, [fetchArtifacts, fetchQueue, fetchStatus, fetchConfig])
 
   useEffect(() => {
     const eventSource = new EventSource('/api/pulz/feed')
@@ -226,6 +244,18 @@ export default function PulzDashboardPage() {
     ? `${status.token_usage ?? 0}`
     : 'Token usage unavailable for this provider'
 
+  const timeLeft = useMemo(() => {
+    if (!status?.ends_at) {
+      return 'N/A'
+    }
+    const end = new Date(status.ends_at).getTime()
+    const now = Date.now()
+    const diff = Math.max(0, Math.floor((end - now) / 1000))
+    const minutes = Math.floor(diff / 60)
+    const seconds = diff % 60
+    return `${minutes}m ${seconds}s`
+  }, [status?.ends_at])
+
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white p-8">
       <div className="max-w-6xl mx-auto">
@@ -273,6 +303,14 @@ export default function PulzDashboardPage() {
           </div>
         </div>
 
+        {backendConnected === false && (
+          <div className="p-4 mb-6 bg-red-900/40 border border-red-500 rounded-lg">
+            <p className="text-red-200">
+              Backend not reachable. Check OpenWebUI logs. {backendError ?? ''}
+            </p>
+          </div>
+        )}
+
         {authRequired && (
           <div className="p-4 mb-6 bg-red-900/40 border border-red-500 rounded-lg">
             <p className="text-red-200">Login required to access the Opportunity Engine API.</p>
@@ -295,6 +333,45 @@ export default function PulzDashboardPage() {
               >
                 {status?.running ? 'RUNNING' : 'IDLE'}
               </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+              <div className="p-3 bg-[#0f1524] border border-gray-700 rounded-lg">
+                <p className="text-gray-400">Mission timeline</p>
+                <p>Start: {status?.started_at ?? 'Not started'}</p>
+                <p>End: {status?.ends_at ?? 'Not scheduled'}</p>
+                <p>Time left: {status?.running ? timeLeft : 'N/A'}</p>
+              </div>
+              <div className="p-3 bg-[#0f1524] border border-gray-700 rounded-lg">
+                <p className="text-gray-400">Backend</p>
+                <p
+                  className={
+                    backendConnected === null
+                      ? 'text-gray-300'
+                      : backendConnected
+                        ? 'text-green-300'
+                        : 'text-red-300'
+                  }
+                >
+                  {backendConnected === null
+                    ? 'Checking...'
+                    : backendConnected
+                      ? 'Connected'
+                      : 'Disconnected'}
+                </p>
+                <p className="text-gray-400 text-xs">
+                  {backendConnected === null
+                    ? 'Awaiting check'
+                    : backendConnected
+                      ? 'API responding'
+                      : backendError ?? 'Backend unavailable'}
+                </p>
+              </div>
+              <div className="p-3 bg-[#0f1524] border border-gray-700 rounded-lg">
+                <p className="text-gray-400">Queue snapshot</p>
+                <p>{queue.length} awaiting approval</p>
+                <p>{artifacts.length} saved artifacts</p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -377,7 +454,7 @@ export default function PulzDashboardPage() {
           </div>
 
           <div className="p-6 bg-[#131824] border border-gray-700 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">System Status</h2>
+            <h2 className="text-xl font-semibold mb-4">Live Mission Telemetry</h2>
             <div className="space-y-3 text-sm text-gray-300">
               <div>
                 <p className="text-gray-400">Last scan</p>
@@ -390,6 +467,10 @@ export default function PulzDashboardPage() {
               <div>
                 <p className="text-gray-400">Items/min</p>
                 <p>{status?.items_per_min ?? 0}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Provider</p>
+                <p>{status?.provider ?? 'heuristic-only'}</p>
               </div>
               <div>
                 <p className="text-gray-400">Model calls</p>

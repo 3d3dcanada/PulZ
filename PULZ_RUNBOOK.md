@@ -67,6 +67,9 @@ All `/api/pulz/*` routes require a verified OpenWebUI user via existing auth mid
 # config endpoint
 curl -sSf http://localhost:3000/api/config > /dev/null
 
+# pulz UI html
+curl -sSf http://localhost:3000/pulz/ | head -n 5
+
 # pulz status
 curl -sSf http://localhost:3000/api/pulz/status
 
@@ -76,4 +79,21 @@ curl -X POST http://localhost:3000/api/pulz/mission/start \
   -d '{"duration_minutes":15,"sources":["reddit_smallbusiness"],"rate_per_source_per_minute":1,"max_items":20}'
 
 curl -N http://localhost:3000/api/pulz/feed
+
+# queue + artifacts
+curl -sSf http://localhost:3000/api/pulz/queue
+curl -sSf http://localhost:3000/api/pulz/artifacts
+
+# confirm DB file persists in the volume path (inside container)
+docker compose exec openwebui ls -la /app/backend/data/pulz
 ```
+
+## Verification checklist (expected outputs)
+
+1. `docker compose up -d` starts the container and healthcheck passes.
+2. `curl -sSf http://localhost:3000/api/config` returns HTTP 200.
+3. `curl -sSf http://localhost:3000/pulz/ | head -n 5` returns HTML.
+4. `curl -sSf http://localhost:3000/api/pulz/status` returns JSON with `running` and `sources` keys.
+5. `curl -N http://localhost:3000/api/pulz/feed` emits `event: heartbeat` and `event: signal`.
+6. Queue/artifacts endpoints return JSON objects with `items`.
+7. `/app/backend/data/pulz/pulz.sqlite3` exists and remains after container restart.

@@ -1,4 +1,5 @@
 import pathlib
+import sys
 
 MARKER_START = "# --- PULZ_PATCH_START"
 MARKER_END = "# --- PULZ_PATCH_END"
@@ -9,6 +10,9 @@ try:
     import importlib.util
     import sys
     import logging
+
+    if "/app" not in sys.path:
+        sys.path.append("/app")
 
     _pulz_spec = importlib.util.spec_from_file_location("pulz_backend", "/app/pulz_backend.py")
     if _pulz_spec and _pulz_spec.loader:
@@ -38,11 +42,18 @@ def apply_patch(main_path: pathlib.Path) -> None:
             new_lines.append(PATCH_BLOCK)
             inserted = True
     if not inserted:
-        new_lines.append(PATCH_BLOCK)
+        raise RuntimeError(f"PulZ patch failed: could not find insertion point '{insert_after}' in {main_path}")
     main_path.write_text("\n".join(new_lines))
 
 
 if __name__ == "__main__":
     main_file = pathlib.Path("/app/backend/open_webui/main.py")
     if main_file.exists():
-        apply_patch(main_file)
+        try:
+            apply_patch(main_file)
+            print("[PulZ] Patch applied successfully.")
+        except Exception as exc:
+            print(f"[PulZ] Patch failed: {exc}", file=sys.stderr)
+            raise
+    else:
+        raise FileNotFoundError(f"[PulZ] OpenWebUI main.py not found at {main_file}")

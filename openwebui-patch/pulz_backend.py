@@ -402,6 +402,11 @@ def _parse_json_block(text: str) -> Optional[Dict[str, Any]]:
 
 
 def _draft_proposal(signal: Signal, scored: Dict[str, Any]) -> Dict[str, Any]:
+    contact_method = {"channel": "unknown", "handle": signal.author, "link": signal.url}
+    if signal.source.startswith("reddit:"):
+        contact_method = {"channel": "reddit", "handle": signal.author, "permalink": signal.url}
+    elif signal.source.startswith("rss:"):
+        contact_method = {"channel": "rss", "author": signal.author, "url": signal.url}
     message = (
         "Hi there! I saw your post and can help with a fast-turnaround solution.\n\n"
         f"Summary: {signal.title}\n"
@@ -421,6 +426,7 @@ def _draft_proposal(signal: Signal, scored: Dict[str, Any]) -> Dict[str, Any]:
         "suggested_price_range": scored.get("suggested_price_range"),
         "estimated_build_time_minutes": scored.get("estimated_build_time_minutes"),
         "message_template": message,
+        "contact_method": contact_method,
     }
 
 
@@ -429,8 +435,6 @@ async def _score_signal(signal: Signal) -> Dict[str, Any]:
     category = _categorize(text)
     estimate = _estimate(text, category)
     recommended = "draft proposal" if _heuristic_score(text) >= 2 else "ignore"
-    if estimate["risk_flags"]:
-        recommended = "needs clarification"
     scored = {
         "category": category,
         "feasibility": estimate["feasibility"],
@@ -451,6 +455,8 @@ async def _score_signal(signal: Signal) -> Dict[str, Any]:
             mission_state.token_usage = (usage.get("prompt_eval_count") or 0) + (usage.get("eval_count") or 0)
         mission_state.model_calls += 1
         mission_state.provider = "ollama"
+    if scored.get("risk_flags"):
+        scored["recommended_next_action"] = "needs clarification"
     return scored
 
 
