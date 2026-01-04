@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getPulzUser } from '@/lib/pulz/user'
@@ -636,7 +636,7 @@ export default function PulzControlRoomPage() {
   }
 
   const missionSummary = status
-    ? `${status.items_processed ?? 0} items · ${status.items_per_min ?? 0} items/min`
+    ? `${status.items_processed ?? 0} items Â· ${status.items_per_min ?? 0} items/min`
     : 'Awaiting status'
 
   return (
@@ -737,7 +737,7 @@ export default function PulzControlRoomPage() {
                 onClick={requestMemorySync}
                 className="mt-2 w-full rounded-lg border border-slate-700 bg-[#0b1020] px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-200"
               >
-                {memorySyncStatus === 'syncing' ? 'Syncing…' : 'Sync Memory'}
+                {memorySyncStatus === 'syncing' ? 'Syncingâ€¦' : 'Sync Memory'}
               </button>
               <p className="mt-2 text-xs text-slate-500">
                 Last sync: {lastMemorySync ? formatTimestamp(lastMemorySync) : 'Unavailable'}
@@ -762,7 +762,7 @@ export default function PulzControlRoomPage() {
                 onChange={(event) => setBudgetCeiling(Number(event.target.value))}
                 className="w-full"
               />
-              <p className="text-xs text-slate-500">${budgetCeiling} cap · backend may enforce stricter limits</p>
+              <p className="text-xs text-slate-500">${budgetCeiling} cap Â· backend may enforce stricter limits</p>
             </div>
           </div>
         </div>
@@ -1137,7 +1137,7 @@ export default function PulzControlRoomPage() {
                                 <div>
                                   <p className="text-[10px] uppercase text-slate-400">Feasibility</p>
                                   <p>
-                                    {signal.scoring.feasibility} · {signal.scoring.estimated_build_time_minutes} min
+                                    {signal.scoring.feasibility} Â· {signal.scoring.estimated_build_time_minutes} min
                                   </p>
                                 </div>
                                 <div>
@@ -1366,7 +1366,7 @@ export default function PulzControlRoomPage() {
                             </div>
                             <div>
                               <p className="text-[10px] uppercase text-slate-400">Tokens used</p>
-                              <p>{metrics?.tokens ?? 'N/A'}</p>
+                              <p>{(typeof metrics?.tokens === 'number') ? metrics.tokens.toLocaleString() : (metrics?.tokens ? JSON.stringify(metrics.tokens) : 'N/A')}</p>
                             </div>
                           </div>
                           {execution.error && (
@@ -1520,3 +1520,5 @@ export default function PulzControlRoomPage() {
     </div>
   )
 }
+
+
