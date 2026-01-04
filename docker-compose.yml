@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    environment:
+      - WEBUI_AUTH=false
+      - PULZ_OLLAMA_URL=http://host.docker.internal:11434/api/generate
+    volumes:
+      - ./control-room/out:/app/pulz-ui:ro
+      - ./openwebui-patch/patch.py:/app/patch.py:ro
+      - ./openwebui-patch/pulz_backend.py:/app/pulz_backend.py:ro
+      - ./openwebui-patch/connectors:/app/connectors:ro
+      - pulz_data:/app/backend/data/pulz
+    command: ["bash", "-c", "python /app/patch.py && /app/backend/start.sh"]
+
+volumes:
+  pulz_data:
