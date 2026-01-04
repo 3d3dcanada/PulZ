@@ -1,0 +1,30 @@
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    environment:
+      - WEBUI_AUTH=false
+      - PULZ_OLLAMA_URL=http://host.docker.internal:11434/api/generate
+      - PYTHONPATH=/app
+    volumes:
+      - ./control-room/out:/app/pulz-ui:ro
+      - ./openwebui-patch/patch.py:/app/patch.py:ro
+      - ./openwebui-patch/pulz_backend.py:/app/pulz_backend.py:ro
+      - ./openwebui-patch/connectors:/app/connectors:ro
+      - pulz_data:/app/backend/data/pulz
+    command: ["bash", "-c", "python /app/patch.py && /app/backend/start.sh"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/api/config', timeout=5).read()\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  pulz_data:
