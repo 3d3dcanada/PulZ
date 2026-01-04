@@ -88,6 +88,18 @@ export default function ActivityPage() {
               Jobs
             </Link>
             <Link
+              href="/pulz/executions"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition"
+            >
+              Executions
+            </Link>
+            <Link
+              href="/pulz/telemetry"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-700 rounded-lg transition"
+            >
+              Telemetry
+            </Link>
+            <Link
               href="/pulz/revenue"
               className="px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded-lg transition"
             >

@@ -19,6 +19,9 @@ type MissionStatus = {
   token_usage?: number | null
   token_usage_available?: boolean
   provider?: string | null
+  mission_id?: string | null
+  authority_mode?: string | null
+  execution_blocked?: boolean
 }
 
 type FeedSignal = {
@@ -76,6 +79,24 @@ type ArtifactItem = {
   }
 }
 
+type ProposalItem = {
+  id: string
+  status: string
+  created_at: string
+  updated_at: string
+  approved_at?: string | null
+  executing_at?: string | null
+  executed_at?: string | null
+  execution_mode?: string | null
+  estimated_revenue_cents?: number | null
+  realized_revenue_cents?: number | null
+  mission_id?: string | null
+  proposal: QueueItem['proposal']
+  title: string
+  url: string
+  source: string
+}
+
 const SOURCE_OPTIONS = [
   { id: 'reddit_smallbusiness', label: 'Reddit r/smallbusiness (new)' },
   { id: 'reddit_entrepreneur', label: 'Reddit r/entrepreneur (new)' },
@@ -83,9 +104,9 @@ const SOURCE_OPTIONS = [
 ]
 
 const DURATIONS = [
-  { label: '15 minutes', value: 15 },
-  { label: '1 hour', value: 60 },
-  { label: '6 hours', value: 360 },
+  { label: '1 hour', value: 1 },
+  { label: '4 hours', value: 4 },
+  { label: '8 hours', value: 8 },
 ]
 
 export default function PulzDashboardPage() {
@@ -93,14 +114,17 @@ export default function PulzDashboardPage() {
   const [status, setStatus] = useState<MissionStatus | null>(null)
   const [feed, setFeed] = useState<FeedSignal[]>([])
   const [queue, setQueue] = useState<QueueItem[]>([])
+  const [proposals, setProposals] = useState<ProposalItem[]>([])
   const [artifacts, setArtifacts] = useState<ArtifactItem[]>([])
-  const [duration, setDuration] = useState(60)
+  const [durationHours, setDurationHours] = useState(1)
   const [rate, setRate] = useState(1)
   const [maxItems, setMaxItems] = useState(100)
   const [selectedSources, setSelectedSources] = useState<string[]>([
     'reddit_smallbusiness',
     'rss_forhire',
   ])
+  const [authorityMode, setAuthorityMode] = useState('auto_draft_queue')
+  const [executionLaneByProposal, setExecutionLaneByProposal] = useState<Record<string, string>>({})
   const [authRequired, setAuthRequired] = useState(false)
   const [missionError, setMissionError] = useState<string | null>(null)
   const [backendConnected, setBackendConnected] = useState<boolean | null>(null)
@@ -145,6 +169,16 @@ export default function PulzDashboardPage() {
     setQueue(data.items)
   }, [])
 
+  const fetchProposals = useCallback(async () => {
+    const response = await fetch('/api/pulz/proposals')
+    if (response.status === 401) {
+      setAuthRequired(true)
+      return
+    }
+    const data = (await response.json()) as { items: ProposalItem[] }
+    setProposals(data.items)
+  }, [])
+
   const fetchArtifacts = useCallback(async () => {
     const response = await fetch('/api/pulz/artifacts')
     if (response.status === 401) {
@@ -158,16 +192,18 @@ export default function PulzDashboardPage() {
   useEffect(() => {
     fetchStatus()
     fetchQueue()
+    fetchProposals()
     fetchArtifacts()
     fetchConfig()
     const interval = setInterval(() => {
       fetchStatus()
       fetchQueue()
+      fetchProposals()
       fetchArtifacts()
       fetchConfig()
     }, 15000)
     return () => clearInterval(interval)
-  }, [fetchArtifacts, fetchQueue, fetchStatus, fetchConfig])
+  }, [fetchArtifacts, fetchQueue, fetchStatus, fetchConfig, fetchProposals])
 
   useEffect(() => {
     const eventSource = new EventSource('/api/pulz/feed')
@@ -180,14 +216,24 @@ export default function PulzDashboardPage() {
       if (payload.running !== status?.running) {
         fetchStatus()
         fetchQueue()
+        fetchProposals()
         fetchArtifacts()
       }
     })
+    const refreshOnExecution = () => {
+      fetchProposals()
+      fetchArtifacts()
+    }
+    eventSource.addEventListener('execution_queued', refreshOnExecution)
+    eventSource.addEventListener('execution_started', refreshOnExecution)
+    eventSource.addEventListener('execution_finished', refreshOnExecution)
+    eventSource.addEventListener('execution_failed', refreshOnExecution)
+    eventSource.addEventListener('execution_cancelled', refreshOnExecution)
     eventSource.onerror = () => {
       eventSource.close()
     }
     return () => eventSource.close()
-  }, [fetchArtifacts, fetchQueue, fetchStatus, status?.running])
+  }, [fetchArtifacts, fetchQueue, fetchStatus, fetchProposals, status?.running])
 
   const toggleSource = (source: string) => {
     setSelectedSources((prev) =>
@@ -201,10 +247,11 @@ export default function PulzDashboardPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        duration_minutes: duration,
+        duration_hours: durationHours,
         sources: selectedSources,
         rate_per_source_per_minute: rate,
         max_items: maxItems,
+        authority_mode: authorityMode,
       }),
     })
     if (response.status === 401) {
@@ -232,12 +279,27 @@ export default function PulzDashboardPage() {
   const approveProposal = async (id: string) => {
     await fetch(`/api/pulz/queue/${id}/approve`, { method: 'POST' })
     await fetchQueue()
+    await fetchProposals()
     await fetchArtifacts()
   }
 
   const rejectProposal = async (id: string) => {
     await fetch(`/api/pulz/queue/${id}/reject`, { method: 'POST' })
     await fetchQueue()
+    await fetchProposals()
+  }
+
+  const executeProposal = async (id: string, lane: string) => {
+    await fetch(`/api/pulz/proposals/${id}/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lane }),
+    })
+    await fetchProposals()
+  }
+
+  const updateExecutionLane = (id: string, lane: string) => {
+    setExecutionLaneByProposal((prev) => ({ ...prev, [id]: lane }))
   }
 
   const tokenUsageLabel = status?.token_usage_available
@@ -255,6 +317,8 @@ export default function PulzDashboardPage() {
     const seconds = diff % 60
     return `${minutes}m ${seconds}s`
   }, [status?.ends_at])
+
+  const statusBadge = status?.authority_mode ?? authorityMode
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white p-8">
@@ -283,10 +347,22 @@ export default function PulzDashboardPage() {
               Drafts
             </Link>
             <Link
+              href="/pulz/executions"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition"
+            >
+              Executions
+            </Link>
+            <Link
               href="/pulz/jobs"
               className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition"
             >
               Jobs
+            </Link>
+            <Link
+              href="/pulz/telemetry"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-700 rounded-lg transition"
+            >
+              Telemetry
             </Link>
             <Link
               href="/pulz/revenue"
@@ -341,6 +417,12 @@ export default function PulzDashboardPage() {
                 <p>Start: {status?.started_at ?? 'Not started'}</p>
                 <p>End: {status?.ends_at ?? 'Not scheduled'}</p>
                 <p>Time left: {status?.running ? timeLeft : 'N/A'}</p>
+                <p>
+                  Execution switch:{' '}
+                  <span className={status?.execution_blocked ? 'text-red-300' : 'text-green-300'}>
+                    {status?.execution_blocked ? 'BLOCKED' : 'ENABLED'}
+                  </span>
+                </p>
               </div>
               <div className="p-3 bg-[#0f1524] border border-gray-700 rounded-lg">
                 <p className="text-gray-400">Backend</p>
@@ -376,18 +458,27 @@ export default function PulzDashboardPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Duration</label>
-                <select
+                <label className="block text-sm text-gray-400 mb-2">Run for (hours)</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={24}
+                  value={durationHours}
+                  onChange={(event) => setDurationHours(Number(event.target.value))}
                   className="w-full bg-[#0f1524] border border-gray-700 rounded-lg p-2"
-                  value={duration}
-                  onChange={(event) => setDuration(Number(event.target.value))}
-                >
+                />
+                <div className="flex gap-2 mt-2 text-xs text-gray-400">
                   {DURATIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
+                    <button
+                      key={option.value}
+                      onClick={() => setDurationHours(option.value)}
+                      className="px-2 py-1 bg-[#0f1524] border border-gray-700 rounded"
+                      type="button"
+                    >
                       {option.label}
-                    </option>
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-2">Throughput</label>
@@ -427,6 +518,22 @@ export default function PulzDashboardPage() {
                     </label>
                   ))}
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Authority mode</label>
+                <select
+                  className="w-full bg-[#0f1524] border border-gray-700 rounded-lg p-2"
+                  value={authorityMode}
+                  onChange={(event) => setAuthorityMode(event.target.value)}
+                >
+                  <option value="scan_only">Scan only</option>
+                  <option value="draft_only">Draft only</option>
+                  <option value="auto_draft_queue">Auto draft + queue</option>
+                  <option value="execute_after_approval">Execute after approval</option>
+                </select>
+                <p className="text-xs text-gray-400 mt-2">
+                  Current: <span className="text-blue-300">{statusBadge}</span>
+                </p>
               </div>
             </div>
 
@@ -544,35 +651,80 @@ export default function PulzDashboardPage() {
 
           <div className="space-y-6">
             <div className="p-6 bg-[#131824] border border-gray-700 rounded-lg">
-              <h2 className="text-xl font-semibold mb-4">Queue</h2>
-              {queue.length === 0 ? (
-                <p className="text-gray-400">No proposals awaiting approval.</p>
+              <h2 className="text-xl font-semibold mb-4">Proposal Pipeline</h2>
+              {proposals.length === 0 ? (
+                <p className="text-gray-400">No proposals yet. Start a mission to begin drafting.</p>
               ) : (
                 <div className="space-y-4">
-                  {queue.map((item) => (
-                    <div key={item.id} className="p-3 bg-[#0f1524] rounded-lg">
-                      <div className="text-xs text-gray-400 mb-1">{item.source}</div>
-                      <h3 className="font-semibold text-sm mb-2">{item.title}</h3>
-                      <p className="text-xs text-gray-400 mb-3">{item.proposal.problem_summary}</p>
-                      <div className="flex gap-2 mb-2">
-                        <button
-                          onClick={() => approveProposal(item.id)}
-                          className="px-3 py-1 text-xs bg-green-600 rounded"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => rejectProposal(item.id)}
-                          className="px-3 py-1 text-xs bg-red-600 rounded"
-                        >
-                          Reject
-                        </button>
+                  {proposals.map((item) => {
+                    const lane = executionLaneByProposal[item.id] ?? 'html'
+                    const stateLabel =
+                      item.status === 'approved'
+                        ? 'Approved → Ready to execute'
+                        : item.status === 'executing'
+                          ? 'Approved → Executing'
+                          : item.status === 'executed'
+                            ? 'Approved → Executed'
+                            : item.status === 'failed'
+                              ? 'Approved → Failed'
+                              : item.status === 'cancelled'
+                                ? 'Approved → Cancelled'
+                                : 'Draft → Queued'
+                    return (
+                      <div key={item.id} className="p-3 bg-[#0f1524] rounded-lg">
+                        <div className="text-xs text-gray-400 mb-1">{item.source}</div>
+                        <h3 className="font-semibold text-sm mb-1">{item.title}</h3>
+                        <p className="text-xs text-gray-400 mb-2">{item.proposal.problem_summary}</p>
+                        <p className="text-xs text-blue-300 mb-2">{stateLabel}</p>
+                        <p className="text-xs text-gray-500 mb-2">
+                          Authority: {item.execution_mode ?? 'manual'}
+                          {item.execution_mode === 'auto_after_approval' &&
+                            item.status === 'queued' && (
+                              <span className="text-emerald-300 ml-2">(Auto-run after approval)</span>
+                            )}
+                        </p>
+                        {item.status === 'queued' && (
+                          <div className="flex gap-2 mb-2">
+                            <button
+                              onClick={() => approveProposal(item.id)}
+                              className="px-3 py-1 text-xs bg-green-600 rounded"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => rejectProposal(item.id)}
+                              className="px-3 py-1 text-xs bg-red-600 rounded"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
+                        {item.status === 'approved' && (
+                          <div className="flex items-center gap-2 mb-2">
+                            <select
+                              value={lane}
+                              onChange={(event) => updateExecutionLane(item.id, event.target.value)}
+                              className="bg-[#0f1524] border border-gray-700 rounded px-2 py-1 text-xs"
+                            >
+                              <option value="html">HTML</option>
+                              <option value="pdf">PDF</option>
+                              <option value="doc">Doc</option>
+                              <option value="site">Site</option>
+                            </select>
+                            <button
+                              onClick={() => executeProposal(item.id, lane)}
+                              className="px-3 py-1 text-xs bg-indigo-600 rounded"
+                            >
+                              Execute
+                            </button>
+                          </div>
+                        )}
+                        <a href={item.url} className="text-xs text-blue-400 hover:underline">
+                          View source
+                        </a>
                       </div>
-                      <a href={item.url} className="text-xs text-blue-400 hover:underline">
-                        View source
-                      </a>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
