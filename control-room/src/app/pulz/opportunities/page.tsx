@@ -149,10 +149,22 @@ export default function OpportunitiesPage() {
               Drafts
             </Link>
             <Link
+              href="/pulz/executions"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition"
+            >
+              Executions
+            </Link>
+            <Link
               href="/pulz/jobs"
               className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition"
             >
               Jobs
+            </Link>
+            <Link
+              href="/pulz/telemetry"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-700 rounded-lg transition"
+            >
+              Telemetry
             </Link>
             <Link
               href="/pulz/revenue"
